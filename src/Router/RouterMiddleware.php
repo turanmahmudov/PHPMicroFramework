@@ -3,6 +3,8 @@
 namespace Framework\Router;
 
 use Exception;
+use Framework\Http\Exception\MethodNotAllowedException;
+use Framework\Http\Exception\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -51,10 +53,10 @@ class RouterMiddleware implements MiddlewareInterface
                 return $handler->handle($request);
 
             case RouterResults::NOT_FOUND:
-                throw new Exception("Not Found", 404);
+                throw new NotFoundException();
 
             case RouterResults::METHOD_NOT_ALLOWED:
-                throw new Exception("Method Not Allowed", 405);
+                throw new MethodNotAllowedException();
 
             default:
                 throw new \RuntimeException("An unexpected error occurred while performing routing.");
