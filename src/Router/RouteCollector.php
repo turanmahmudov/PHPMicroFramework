@@ -33,6 +33,17 @@ class RouteCollector implements RouteCollectorInterface
     protected int $routeCounter = 0;
 
     /**
+     * @var array<string, string>
+     */
+    protected array $patternMatchers = [
+        '/{(.+?):number}/'        => '{$1:[0-9]+}',
+        '/{(.+?):word}/'          => '{$1:[a-zA-Z]+}',
+        '/{(.+?):alphanum_dash}/' => '{$1:[a-zA-Z0-9-_]+}',
+        '/{(.+?):slug}/'          => '{$1:[a-z0-9-]+}',
+        '/{(.+?):uuid}/'          => '{$1:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}+}'
+    ];
+
+    /**
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -45,7 +56,7 @@ class RouteCollector implements RouteCollectorInterface
      */
     public function map(string $method, string $pattern, $handler): RouteInterface
     {
-        $pattern = $this->groupPattern . $pattern;
+        $pattern = $this->parseRoutePath($this->groupPattern . $pattern);
 
         $route = Route::create(strtoupper($method), $pattern, $handler, $this->routeGroups, $this->container, $this->routeCounter);
         $this->routes[$route->getIdentifier()] = $route;
@@ -71,6 +82,19 @@ class RouteCollector implements RouteCollectorInterface
         $this->groupPattern = $currentGroupPattern;
 
         return $routeGroup;
+    }
+
+    /**
+     * @param string $alias
+     * @param string $regex
+     * @return RouteCollectorInterface
+     */
+    public function addPatternMatcher(string $alias, string $regex): RouteCollectorInterface
+    {
+        $pattern = '/{(.+?):' . $alias . '}/';
+        $regex = '{$1:' . $regex . '}';
+        $this->patternMatchers[$pattern] = $regex;
+        return $this;
     }
 
     /**
@@ -112,5 +136,14 @@ class RouteCollector implements RouteCollectorInterface
     public function getRouteMatcher(): RouteMatcherInterface
     {
         return new RouteMatcher($this->routes);
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function parseRoutePath(string $path): string
+    {
+        return preg_replace(array_keys($this->patternMatchers), array_values($this->patternMatchers), $path);
     }
 }
