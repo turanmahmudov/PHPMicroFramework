@@ -1,5 +1,6 @@
 {
     "name": "turanmahmudov/php-micro-framework",
+    "type": "library",
     "description": "a micro php framework",
     "license": "Apache-2.0",
     "authors": [
