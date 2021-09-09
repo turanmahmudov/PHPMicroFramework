@@ -7,6 +7,13 @@ use Exception;
 
 class MethodNotAllowedException extends Http\Exception
 {
+    /**
+     * MethodNotAllowedException constructor.
+     * @param array<string, mixed> $allowed
+     * @param string $message
+     * @param Exception|null $previous
+     * @param int $code
+     */
     public function __construct(
         array $allowed = [],
         string $message = 'Method Not Allowed',

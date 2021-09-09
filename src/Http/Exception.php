@@ -8,12 +8,12 @@ use Psr\Http\Message\ResponseInterface;
 class Exception extends \Exception implements HttpExceptionInterface
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected array $headers = [];
 
     /**
-     * @var string|null
+     * @var string
      */
     protected $message;
 
@@ -27,9 +27,17 @@ class Exception extends \Exception implements HttpExceptionInterface
      */
     protected ?\Exception $previous;
 
+    /**
+     * Exception constructor.
+     * @param int $status
+     * @param string $message
+     * @param \Exception|null $previous
+     * @param array<string, mixed> $headers
+     * @param int $code
+     */
     public function __construct(
         int $status,
-        string $message = null,
+        string $message = "",
         \Exception $previous = null,
         array $headers = [],
         int $code = 0

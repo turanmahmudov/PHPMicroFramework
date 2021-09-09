@@ -15,7 +15,7 @@ interface HttpExceptionInterface
     public function buildJsonResponse(ResponseInterface $response): ResponseInterface;
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getHeaders(): array;
 
