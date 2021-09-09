@@ -20,16 +20,21 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     protected RequestHandlerInterface $handler;
 
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
-    protected ContainerInterface $container;
+    protected ?ContainerInterface $container;
 
     /**
-     * @var SplQueue|null
+     * @var SplQueue<MiddlewareInterface>|null
      */
     protected ?SplQueue $middleware;
 
-    public function __construct(RequestHandlerInterface $handler, ContainerInterface $container)
+    /**
+     * MiddlewareDispatcher constructor.
+     * @param RequestHandlerInterface $handler
+     * @param ContainerInterface|null $container
+     */
+    public function __construct(RequestHandlerInterface $handler, ?ContainerInterface $container = null)
     {
         $this->handler = $handler;
         $this->container = $container;
@@ -43,7 +48,11 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     public function add($middleware)
     {
         if (is_string($middleware)) {
-            $middleware = $this->container->get($middleware);
+            if ($this->container) {
+                $middleware = $this->container->get($middleware);
+            } else {
+                $middleware = new $middleware;
+            }
         }
 
         if ($middleware instanceof MiddlewareInterface) {
@@ -69,7 +78,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
      */
     public function addMiddleware(MiddlewareInterface $middleware): MiddlewareDispatcherInterface
     {
-        $this->middleware->enqueue($middleware);
+        $this->enqueue($middleware);
 
         return $this;
     }
@@ -80,6 +89,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
      */
     public function addRequestHandler(RequestHandlerInterface $middleware): MiddlewareDispatcherInterface
     {
+        /** @var MiddlewareInterface $middleware */
         $middleware = new class ($middleware) implements MiddlewareInterface {
             protected RequestHandlerInterface $middleware;
 
@@ -99,7 +109,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
             }
         };
 
-        $this->middleware->enqueue($middleware);
+        $this->enqueue($middleware);
 
         return $this;
     }
@@ -114,6 +124,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
             $middleware = $middleware->bindTo($this->container);
         }
 
+        /** @var MiddlewareInterface $middleware */
         $middleware = new class ($middleware) implements MiddlewareInterface {
             protected $middleware;
 
@@ -128,9 +139,17 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
             }
         };
 
-        $this->middleware->enqueue($middleware);
+        $this->enqueue($middleware);
 
         return $this;
+    }
+
+    /**
+     * @param MiddlewareInterface $middleware
+     */
+    protected function enqueue(MiddlewareInterface $middleware): void
+    {
+        if ($this->middleware) $this->middleware->enqueue($middleware);
     }
 
     /**

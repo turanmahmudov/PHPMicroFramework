@@ -6,7 +6,10 @@ use Framework\Middleware\MiddlewareAwareTrait;
 use Framework\Middleware\MiddlewareDispatcherInterface;
 use Framework\Router\RouteAwareTrait;
 use Framework\Router\RouteCollectorInterface;
+use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Laminas\HttpHandlerRunner\Emitter\EmitterStack;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -53,7 +56,7 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->middlewareDispatcher->handle($request);
+        return $this->getMiddlewareDispatcher()->handle($request);
     }
 
     /**
@@ -63,7 +66,7 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $this->middlewareDispatcher->process($request, $handler);
+        return $this->getMiddlewareDispatcher()->process($request, $handler);
     }
 
     /**
@@ -72,17 +75,21 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
     public function run(?ServerRequestInterface $request = null): void
     {
         if (!$request) {
-            $request = $this->container->get(ServerRequestInterface::class);
+            if ($this->getContainer()) {
+                $request = $this->getContainer()->get(ServerRequestInterface::class);
+            } else {
+                $request = ServerRequestFactory::fromGlobals();
+            }
         }
 
         $response = $this->handle($request);
-        $this->responseEmitter->emit($response);
+        $this->getResponseEmitter()->emit($response);
     }
 
     /**
-     * @return ContainerInterface
+     * @return ContainerInterface|null
      */
-    public function getContainer(): ContainerInterface
+    public function getContainer(): ?ContainerInterface
     {
         return $this->container;
     }
@@ -93,5 +100,13 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
     public function getResponseFactory(): ResponseFactoryInterface
     {
         return $this->responseFactory;
+    }
+
+    /**
+     * @return EmitterInterface
+     */
+    public function getResponseEmitter(): EmitterInterface
+    {
+        return $this->responseEmitter ?? $this->responseEmitter = new SapiEmitter();
     }
 }

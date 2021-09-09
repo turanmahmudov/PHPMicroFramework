@@ -62,8 +62,8 @@ class ContainerFactory
             Application::class => factory(ApplicationFactory::class),
             MiddlewareDispatcherInterface::class => factory(MiddlewareDispatcherFactory::class),
             EmitterInterface::class => factory(EmitterFactory::class),
-            RouteCollectorInterface::class => function(ContainerInterface $container) {
-                return new RouteCollector($container);
+            RouteCollectorInterface::class => function(ContainerInterface $container, ResponseFactoryInterface $responseFactory) {
+                return new RouteCollector($container, $responseFactory);
             }
         ];
 
