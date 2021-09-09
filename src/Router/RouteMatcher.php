@@ -46,7 +46,31 @@ final class RouteMatcher implements RouteMatcherInterface
 
         $routeInfo = $this->dispatcher->dispatch($method, $path);
 
-        return new RouterResults($method, $path, $routeInfo[0], $routeInfo[1], $routeInfo[2] ?? []);
+        if ($routeInfo[0] == $this->getDispatcher()::FOUND) {
+            return new RouterResults(
+                $method,
+                $path,
+                $routeInfo[0],
+                $routeInfo[1],
+                $routeInfo[2] ?? []
+            );
+        } elseif ($routeInfo[0] == $this->getDispatcher()::METHOD_NOT_ALLOWED) {
+            return new RouterResults(
+                $method,
+                $path,
+                $routeInfo[0],
+                null,
+                [],
+                $routeInfo[1]
+            );
+        } else {
+            return new RouterResults(
+                $method,
+                $path,
+                $routeInfo[0],
+                null
+            );
+        }
     }
 
     /**

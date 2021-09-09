@@ -3,14 +3,20 @@
 namespace Framework\Router;
 
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use RuntimeException;
 
 class RouteCollector implements RouteCollectorInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
-    protected ContainerInterface $container;
+    protected ?ContainerInterface $container;
+
+    /**
+     * @var ResponseFactoryInterface
+     */
+    protected ResponseFactoryInterface $responseFactory;
 
     /**
      * @var array<string, RouteInterface>
@@ -44,11 +50,13 @@ class RouteCollector implements RouteCollectorInterface
     ];
 
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface|null $container
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(?ContainerInterface $container, ResponseFactoryInterface $responseFactory)
     {
         $this->container = $container;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -58,7 +66,15 @@ class RouteCollector implements RouteCollectorInterface
     {
         $pattern = $this->parseRoutePath($this->groupPattern . $pattern);
 
-        $route = Route::create(strtoupper($method), $pattern, $handler, $this->routeGroups, $this->container, $this->routeCounter);
+        $route = Route::create(
+            strtoupper($method),
+            $pattern,
+            $handler,
+            $this->responseFactory,
+            $this->routeGroups,
+            $this->container,
+            $this->routeCounter
+        );
         $this->routes[$route->getIdentifier()] = $route;
         $this->routeCounter++;
 

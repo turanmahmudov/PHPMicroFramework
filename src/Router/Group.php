@@ -69,8 +69,7 @@ final class Group implements GroupInterface
     }
 
     /**
-     * @param MiddlewareDispatcherInterface $dispatcher
-     * @return GroupInterface
+     * {@inheritDoc}
      */
     public function appendMiddlewareToDispatcher(MiddlewareDispatcherInterface $dispatcher): GroupInterface
     {
@@ -87,5 +86,13 @@ final class Group implements GroupInterface
     public function getMiddlewares(): array
     {
         return $this->middlewares;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
     }
 }

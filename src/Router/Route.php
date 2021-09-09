@@ -2,13 +2,16 @@
 
 namespace Framework\Router;
 
+use ArgumentsResolver\InDepthArgumentsResolver;
 use Framework\Middleware\MiddlewareDispatcher;
 use Framework\Middleware\MiddlewareDispatcherInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionClass;
 use RuntimeException;
 
 final class Route implements RouteInterface
@@ -57,6 +60,11 @@ final class Route implements RouteInterface
     protected ?ContainerInterface $container;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    protected ResponseFactoryInterface $responseFactory;
+
+    /**
      * @var bool
      */
     protected bool $groupMiddlewareAppended = false;
@@ -65,6 +73,7 @@ final class Route implements RouteInterface
      * @param string $method
      * @param string $path
      * @param string|callable|array<mixed>|RequestHandlerInterface $requestHandler
+     * @param ResponseFactoryInterface $responseFactory
      * @param array<GroupInterface> $routeGroups
      * @param ContainerInterface|null $container
      * @param int $identifier
@@ -73,6 +82,7 @@ final class Route implements RouteInterface
         string $method,
         string $path,
         $requestHandler,
+        ResponseFactoryInterface $responseFactory,
         array $routeGroups = [],
         ?ContainerInterface $container = null,
         int $identifier = 0
@@ -88,12 +98,15 @@ final class Route implements RouteInterface
         $this->identifier = 'route' . $identifier;
 
         $this->middlewareDispatcher = new MiddlewareDispatcher($this, $this->container);
+
+        $this->responseFactory = $responseFactory;
     }
 
     /**
      * @param string $method
      * @param string $path
      * @param string|callable|array<mixed>|RequestHandlerInterface $requestHandler
+     * @param ResponseFactoryInterface $responseFactory
      * @param array<GroupInterface> $routeGroups
      * @param ContainerInterface|null $container
      * @param int $identifier
@@ -103,11 +116,12 @@ final class Route implements RouteInterface
         string $method,
         string $path,
         $requestHandler,
+        ResponseFactoryInterface $responseFactory,
         array $routeGroups = [],
         ?ContainerInterface $container = null,
         int $identifier = 0
     ): self {
-        return new self($method, $path, $requestHandler, $routeGroups, $container, $identifier);
+        return new self($method, $path, $requestHandler, $responseFactory, $routeGroups, $container, $identifier);
     }
 
     /**
@@ -129,8 +143,7 @@ final class Route implements RouteInterface
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * {@inheritDoc}
      */
     public function run(ServerRequestInterface $request): ResponseInterface
     {
@@ -144,15 +157,16 @@ final class Route implements RouteInterface
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws \ReflectionException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $requestHandler = $this->getRequestHandler();
 
-        if (is_string($requestHandler)) {
+        if (is_string($requestHandler) && $this->container) {
             $requestHandler = $this->container->get($requestHandler);
         }
-        if (is_array($requestHandler) && count($requestHandler) === 2 && is_string($requestHandler[0])) {
+        if (is_array($requestHandler) && count($requestHandler) === 2 && is_string($requestHandler[0]) && $this->container) {
             $requestHandler[0] = $this->container->get($requestHandler[0]);
         }
 
@@ -161,12 +175,21 @@ final class Route implements RouteInterface
         }
 
         if (is_callable($requestHandler)) {
-            return $this->container->call($requestHandler,
-                [
+            if ($this->container && method_exists($this->container, 'call')) {
+                return $this->container->call($requestHandler,
+                    [
+                        'request' => $request,
+                        'response' => $this->responseFactory->createResponse(),
+                        'args' => $this->getAttributes(),
+                    ]
+                );
+            } else {
+                return call_user_func_array($requestHandler, (new InDepthArgumentsResolver($requestHandler))->resolve([
                     'request' => $request,
-                    'args' => $this->getAttributes(),
-                ]
-            );
+                    'response' => $this->responseFactory->createResponse(),
+                    'args' => $this->getAttributes()
+                ]));
+            }
         }
 
         throw new RuntimeException("Can't run route");

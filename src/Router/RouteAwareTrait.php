@@ -96,7 +96,7 @@ trait RouteAwareTrait
      */
     public function getRouteCollector(): RouteCollectorInterface
     {
-        return $this->routeCollector;
+        return $this->routeCollector ?? $this->routeCollector = new RouteCollector($this->getContainer(), $this->responseFactory);
     }
 
     /**
