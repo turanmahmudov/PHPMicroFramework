@@ -20,7 +20,9 @@
         "laminas/laminas-diactoros": "^2.6",
         "laminas/laminas-httphandlerrunner": "^2.0",
         "doctrine/annotations": "^1.13",
-        "nikic/fast-route": "^1.3"
+        "nikic/fast-route": "^1.3",
+        "rybakit/arguments-resolver": "^0.6.2",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.94",
@@ -28,7 +30,9 @@
         "php-coveralls/php-coveralls": "^2.4.3",
         "phploc/phploc": "^7.0.2",
         "phpstan/extension-installer": "^1.1",
-        "infection/infection": "^0.20.2"
+        "infection/infection": "^0.20.2",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "friendsofphp/php-cs-fixer": "^2.18.1"
     },
     "autoload": {
         "psr-4": {
@@ -45,7 +49,6 @@
         "test": [
             "@test:lint",
             "@test:unit",
-            "@test:integration",
             "@test:infection",
             "@test:static-analysis",
             "@test:loc",
@@ -53,10 +56,9 @@
         ],
         "test:cs": "mkdir -p build && vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --cache-file=build/phpcs.cache",
         "test:infection": "vendor/bin/infection --threads=$(nproc) --min-msi=100 --verbose --coverage=build/phpunit",
-        "test:integration": "vendor/bin/phpunit --testsuite=Integration --cache-result-file=build/phpunit/result.cache",
         "test:lint": "mkdir -p build && find src tests -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php -l | tee build/phplint.log",
-        "test:loc": "mkdir -p build && vendor/bin/phploc src --verbose | tee build/phploc.log",
+        "test:loc": "mkdir -p build && vendor/bin/phploc src | tee build/phploc.log",
         "test:static-analysis": "mkdir -p build && bash -c 'vendor/bin/phpstan analyse src --no-progress --level=8 --error-format=junit | tee build/phpstan.junit.xml; if [ ${PIPESTATUS[0]} -ne \"0\" ]; then exit 1; fi'",
-        "test:unit": "vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=build/phpunit/clover.xml --coverage-html=build/phpunit/coverage-html --coverage-xml=build/phpunit/coverage-xml --log-junit=build/phpunit/junit.xml --cache-result-file=build/phpunit/result.cache"
+        "test:unit": "vendor/bin/phpunit --testsuite=Unit --coverage-clover=build/phpunit/clover.xml --coverage-html=build/phpunit/coverage-html --coverage-xml=build/phpunit/coverage-xml --log-junit=build/phpunit/junit.xml --cache-result-file=build/phpunit/result.cache"
     }
 }
