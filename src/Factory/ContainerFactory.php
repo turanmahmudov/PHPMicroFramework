@@ -25,7 +25,6 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
-use Psr\Http\Message\UriInterface;
 use function DI\factory;
 
 class ContainerFactory
