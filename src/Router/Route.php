@@ -37,7 +37,7 @@ final class Route implements RouteInterface
      */
     protected string $path;
 
-    /** @var string|array<mixed>|RequestHandlerInterface|MiddlewareInterface */
+    /** @var string|callable|array<mixed>|RequestHandlerInterface|MiddlewareInterface */
     protected $requestHandler;
 
     /**
@@ -73,7 +73,7 @@ final class Route implements RouteInterface
     /**
      * @param string $method
      * @param string $path
-     * @param string|callable|array<mixed>|RequestHandlerInterface $requestHandler
+     * @param string|callable|array<mixed>|RequestHandlerInterface|MiddlewareInterface $requestHandler
      * @param ResponseFactoryInterface $responseFactory
      * @param array<GroupInterface> $routeGroups
      * @param ContainerInterface|null $container

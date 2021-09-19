@@ -32,4 +32,14 @@ interface RouteCollectorInterface
      * @return RouteInterface
      */
     public function getNamedRoute(string $name): RouteInterface;
+
+    /**
+     * @return array<string, RouteInterface>
+     */
+    public function getRoutes(): array;
+
+    /**
+     * @return RouteMatcherInterface
+     */
+    public function getRouteMatcher(): RouteMatcherInterface;
 }

@@ -84,7 +84,7 @@ class Exception extends \Exception implements HttpExceptionInterface
             $response->getBody()->write(json_encode([
                 'status_code' => $this->status,
                 'reason_phrase' => $this->message,
-            ]));
+            ]) ?: '');
         }
 
         return $response->withStatus($this->status, $this->message);

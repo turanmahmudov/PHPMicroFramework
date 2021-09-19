@@ -25,6 +25,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
+use Psr\Http\Message\UriInterface;
 use function DI\factory;
 
 class ContainerFactory
@@ -58,8 +59,17 @@ class ContainerFactory
             ResponseInterface::class => function (ResponseFactoryInterface $responseFactory) {
                 return $responseFactory->createResponse();
             },
-            ServerRequestInterface::class => function (ServerRequestFactoryInterface $serverRequestFactory) {
-                return $serverRequestFactory::fromGlobals();
+            ServerRequestInterface::class => function (
+                ServerRequestFactoryInterface $serverRequestFactory,
+                UriFactoryInterface $uriFactory
+            ) {
+                return method_exists($serverRequestFactory, 'fromGlobals') ?
+                    $serverRequestFactory::fromGlobals() :
+                    $serverRequestFactory->createServerRequest(
+                        $_SERVER['REQUEST_METHOD'],
+                        $uriFactory->createUri(''),
+                        $_SERVER
+                    );
             },
 
             Application::class => factory(ApplicationFactory::class),

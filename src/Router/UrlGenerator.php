@@ -80,7 +80,7 @@ class UrlGenerator implements UrlGeneratorInterface
     /**
      * @param array<int, array<int, array|string>> $routePartSets
      * @param array<string> $attributes
-     * @return int|string
+     * @return ?int
      */
     protected function getRouteIndex(array $routePartSets, array $attributes)
     {
@@ -105,14 +105,14 @@ class UrlGenerator implements UrlGeneratorInterface
      * @param string $name
      * @param array<int, array<int, array|string>> $routePartSets
      * @param array<string> $attributes
-     * @param int $routeIndex
+     * @param ?int $routeIndex
      * @return string
      */
     protected function generatePathFromAttributes(
         string $name,
         array $routePartSets,
         array $attributes,
-        int $routeIndex
+        ?int $routeIndex
     ) {
         $pathParts = [];
 

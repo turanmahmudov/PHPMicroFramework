@@ -78,7 +78,7 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
     public function run(?ServerRequestInterface $request = null): void
     {
         if (!$request) {
-            if ($this->getContainer()) {
+            if ($this->getContainer() instanceof ContainerInterface) {
                 $request = $this->getContainer()->get(ServerRequestInterface::class);
             } else {
                 $request = ServerRequestFactory::fromGlobals();

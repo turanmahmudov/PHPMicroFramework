@@ -128,6 +128,9 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
 
         /** @var MiddlewareInterface $middleware */
         $middleware = new class ($middleware) implements MiddlewareInterface {
+            /**
+             * @var callable
+             */
             protected $middleware;
 
             public function __construct(callable $middleware)

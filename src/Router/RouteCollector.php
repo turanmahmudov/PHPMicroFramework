@@ -139,7 +139,7 @@ class RouteCollector implements RouteCollectorInterface
     }
 
     /**
-     * @return array<string, RouteInterface>
+     * {@inheritDoc}
      */
     public function getRoutes(): array
     {
@@ -147,7 +147,7 @@ class RouteCollector implements RouteCollectorInterface
     }
 
     /**
-     * @return RouteMatcherInterface
+     * {@inheritDoc}
      */
     public function getRouteMatcher(): RouteMatcherInterface
     {
@@ -160,6 +160,6 @@ class RouteCollector implements RouteCollectorInterface
      */
     protected function parseRoutePath(string $path): string
     {
-        return preg_replace(array_keys($this->patternMatchers), array_values($this->patternMatchers), $path);
+        return preg_replace(array_keys($this->patternMatchers), array_values($this->patternMatchers), $path) ?: $path;
     }
 }
