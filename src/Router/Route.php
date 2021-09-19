@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
 
 final class Route implements RouteInterface
@@ -156,7 +157,7 @@ final class Route implements RouteInterface
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

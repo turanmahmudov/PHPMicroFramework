@@ -295,7 +295,7 @@ class ApplicationTest extends TestCase
             $responseFactoryProphecy->reveal()
         );
         $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
-            $responseFactoryProphecy->reveal()->createResponse();
+            return $responseFactoryProphecy->reveal()->createResponse();
         });
 
         $app->add(new RouterMiddleware($app->getRouteCollector()));

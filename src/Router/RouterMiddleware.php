@@ -9,18 +9,19 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use RuntimeException;
 
 class RouterMiddleware implements MiddlewareInterface
 {
     /**
-     * @var RouteCollector
+     * @var RouteCollectorInterface
      */
-    protected RouteCollector $routeCollector;
+    protected RouteCollectorInterface $routeCollector;
 
     /**
-     * @param RouteCollector $routeCollector
+     * @param RouteCollectorInterface $routeCollector
      */
-    public function __construct(RouteCollector $routeCollector)
+    public function __construct(RouteCollectorInterface $routeCollector)
     {
         $this->routeCollector = $routeCollector;
     }
@@ -59,7 +60,7 @@ class RouterMiddleware implements MiddlewareInterface
                 throw new MethodNotAllowedException();
 
             default:
-                throw new \RuntimeException("An unexpected error occurred while performing routing.");
+                throw new RuntimeException("An unexpected error occurred while performing routing.");
         }
     }
 }
