@@ -51,7 +51,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
             if ($this->container) {
                 $middleware = $this->container->get($middleware);
             } else {
-                $middleware = new $middleware;
+                $middleware = new $middleware();
             }
         }
 
@@ -98,8 +98,10 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
                 $this->middleware = $middleware;
             }
 
-            public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-            {
+            public function process(
+                ServerRequestInterface $request,
+                RequestHandlerInterface $handler
+            ): ResponseInterface {
                 return $this->handle($request);
             }
 
@@ -133,8 +135,10 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
                 $this->middleware = $middleware;
             }
 
-            public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-            {
+            public function process(
+                ServerRequestInterface $request,
+                RequestHandlerInterface $handler
+            ): ResponseInterface {
                 return ($this->middleware)($request, $handler);
             }
         };
@@ -149,7 +153,9 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
      */
     protected function enqueue(MiddlewareInterface $middleware): void
     {
-        if ($this->middleware) $this->middleware->enqueue($middleware);
+        if ($this->middleware) {
+            $this->middleware->enqueue($middleware);
+        }
     }
 
     /**

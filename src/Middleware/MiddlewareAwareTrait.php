@@ -29,7 +29,11 @@ trait MiddlewareAwareTrait
      */
     public function getMiddlewareDispatcher(): MiddlewareDispatcherInterface
     {
-        return $this->middlewareDispatcher ?? $this->middlewareDispatcher = new MiddlewareDispatcher(new EmptyPipelineHandler(__CLASS__), $this->getContainer());
+        return $this->middlewareDispatcher ??
+            $this->middlewareDispatcher = new MiddlewareDispatcher(
+                new EmptyPipelineHandler(__CLASS__),
+                $this->getContainer()
+            );
     }
 
     /**

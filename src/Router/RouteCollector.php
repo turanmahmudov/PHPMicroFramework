@@ -141,7 +141,7 @@ class RouteCollector implements RouteCollectorInterface
     /**
      * @return array<string, RouteInterface>
      */
-    public function getRoutes() : array
+    public function getRoutes(): array
     {
         return $this->routes;
     }

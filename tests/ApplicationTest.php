@@ -13,11 +13,8 @@ use Framework\Middleware\MiddlewareDispatcherInterface;
 use Framework\Router\DispatchMiddleware;
 use Framework\Router\RouteCollector;
 use Framework\Router\RouteCollectorInterface;
-use Framework\Router\RouteInterface;
 use Framework\Router\RouterMiddleware;
-use Framework\Router\RouterResults;
 use Laminas\Diactoros\ServerRequest;
-use Laminas\Diactoros\ServerRequestFactory;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -27,16 +24,19 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class ApplicationTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetContainer()
+    public function testGetContainer(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
@@ -45,7 +45,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($containerProphecy->reveal(), $app->getContainer());
     }
 
-    public function testGetResponseFactoryReturnsInjectedInstance()
+    public function testGetResponseFactoryReturnsInjectedInstance(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $app = new Application($responseFactoryProphecy->reveal());
@@ -53,7 +53,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($responseFactoryProphecy->reveal(), $app->getResponseFactory());
     }
 
-    public function testGetRouteCollectorReturnsInjectedInstance()
+    public function testGetRouteCollectorReturnsInjectedInstance(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $routeCollectorProphecy = $this->prophesize(RouteCollectorInterface::class);
@@ -67,7 +67,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($routeCollectorProphecy->reveal(), $app->getRouteCollector());
     }
 
-    public function testSetRouteCollector()
+    public function testSetRouteCollector(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $routeCollectorProphecy = $this->prophesize(RouteCollectorInterface::class);
@@ -79,7 +79,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($routeCollectorProphecy->reveal(), $app->getRouteCollector());
     }
 
-    public function testCreatesRouteCollectorWhenNullWithInjectedContainer()
+    public function testCreatesRouteCollectorWhenNullWithInjectedContainer(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
@@ -93,7 +93,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals($routeCollector, $app->getRouteCollector());
     }
 
-    public function testGetDispatcherReturnsInjectedInstance()
+    public function testGetDispatcherReturnsInjectedInstance(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $middlewareDispatcherProphecy = $this->prophesize(MiddlewareDispatcherInterface::class);
@@ -107,7 +107,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($middlewareDispatcherProphecy->reveal(), $app->getMiddlewareDispatcher());
     }
 
-    public function testSetDispatcher()
+    public function testSetDispatcher(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $middlewareDispatcherProphecy = $this->prophesize(MiddlewareDispatcherInterface::class);
@@ -120,7 +120,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($middlewareDispatcherProphecy->reveal(), $app->getMiddlewareDispatcher());
     }
 
-    public function testHandleReturnsErrorWhenNoDispatchMiddleware()
+    public function testHandleReturnsErrorWhenNoDispatchMiddleware(): void
     {
         $this->expectException(OutOfBoundsException::class);
 
@@ -133,7 +133,7 @@ class ApplicationTest extends TestCase
         $app->handle($requestProphecy->reveal());
     }
 
-    public function testProcessReturnsErrorWhenNoDispatchMiddleware()
+    public function testProcessReturnsErrorWhenNoDispatchMiddleware(): void
     {
         $this->expectException(OutOfBoundsException::class);
 
@@ -147,7 +147,7 @@ class ApplicationTest extends TestCase
         $app->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal());
     }
 
-    public function testHandleProxiesToDispatcherToHandle()
+    public function testHandleProxiesToDispatcherToHandle(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $requestProphecy = $this->prophesize(ServerRequestInterface::class);
@@ -165,7 +165,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($responseProphecy->reveal(), $app->handle($requestProphecy->reveal()));
     }
 
-    public function testProcessProxiesToDispatcherToHandle()
+    public function testProcessProxiesToDispatcherToHandle(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $requestProphecy = $this->prophesize(ServerRequestInterface::class);
@@ -173,7 +173,10 @@ class ApplicationTest extends TestCase
         $requestHandlerProphecy = $this->prophesize(RequestHandlerInterface::class);
 
         $middlewareDispatcherProphecy = $this->prophesize(MiddlewareDispatcherInterface::class);
-        $middlewareDispatcherProphecy->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal())->willReturn($responseProphecy->reveal());
+        $middlewareDispatcherProphecy->process(
+            $requestProphecy->reveal(),
+            $requestHandlerProphecy->reveal()
+        )->willReturn($responseProphecy->reveal());
 
         $app = new Application(
             $responseFactoryProphecy->reveal(),
@@ -181,10 +184,13 @@ class ApplicationTest extends TestCase
             $middlewareDispatcherProphecy->reveal()
         );
 
-        $this->assertSame($responseProphecy->reveal(), $app->process($requestProphecy->reveal(), $requestHandlerProphecy->reveal()));
+        $this->assertSame($responseProphecy->reveal(), $app->process(
+            $requestProphecy->reveal(),
+            $requestHandlerProphecy->reveal()
+        ));
     }
 
-    public function testAddProxiesToDispatcherToAdd()
+    public function testAddProxiesToDispatcherToAdd(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $requestProphecy = $this->prophesize(ServerRequestInterface::class);
@@ -202,14 +208,16 @@ class ApplicationTest extends TestCase
             $responseFactoryProphecy->reveal()
         );
 
-        $this->assertSame($middlewareDispatcher->handle($requestProphecy->reveal()), $app->add($middlewareProphecy->reveal())->handle($requestProphecy->reveal()));
+        $this->assertSame(
+            $middlewareDispatcher->handle($requestProphecy->reveal()),
+            $app->add($middlewareProphecy->reveal())->handle($requestProphecy->reveal())
+        );
     }
 
     /**
-     * @param string $method
      * @dataProvider upperCaseRequestMethodsProvider
      */
-    public function testGetPostPutPatchDeleteOptionsMethods(string $method)
+    public function testGetPostPutPatchDeleteOptionsMethods(string $method): void
     {
         $responseProphecy = $this->prophesize(ResponseInterface::class);
         $responseProphecy->getBody()->willReturn('Hello World');
@@ -228,7 +236,7 @@ class ApplicationTest extends TestCase
         $app = new Application(
             $responseFactoryProphecy->reveal()
         );
-        $app->$methodName('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
+        $app->{$methodName}('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
             return $responseFactoryProphecy->reveal()->createResponse();
         });
 
@@ -239,7 +247,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals('Hello World', (string) $response->getBody());
     }
 
-    public function testRouteMethodNotAllowed()
+    public function testRouteMethodNotAllowed(): void
     {
         $this->expectException(MethodNotAllowedException::class);
 
@@ -268,7 +276,7 @@ class ApplicationTest extends TestCase
         $app->handle($request);
     }
 
-    public function testRouteMatching()
+    public function testRouteMatching(): void
     {
         $responseProphecy = $this->prophesize(ResponseInterface::class);
         $responseProphecy->getBody()->willReturn('Hello World');
@@ -287,7 +295,7 @@ class ApplicationTest extends TestCase
             $responseFactoryProphecy->reveal()
         );
         $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
-            return $responseFactoryProphecy->reveal()->createResponse();
+            $responseFactoryProphecy->reveal()->createResponse();
         });
 
         $app->add(new RouterMiddleware($app->getRouteCollector()));
@@ -298,11 +306,11 @@ class ApplicationTest extends TestCase
         $this->assertEquals('Hello World', (string) $response->getBody());
     }
 
-    public function testRouteMatchingWithNamedParam()
+    public function testRouteMatchingWithNamedParam(): void
     {
         $streamProphecy = $this->prophesize(StreamInterface::class);
         $streamProphecy->__toString()->willReturn('');
-        $streamProphecy->write(Argument::type('string'))->will(function ($args) {
+        $streamProphecy->write(Argument::type('string'))->will(function ($args): void {
             $body = $this->reveal()->__toString();
             $body .= $args[0];
             $this->__toString()->willReturn($body);
@@ -324,9 +332,13 @@ class ApplicationTest extends TestCase
         $app = new Application(
             $responseFactoryProphecy->reveal()
         );
-        $app->get('/hello/{name}', function (ServerRequestInterface $request, array $args = []) use ($responseFactoryProphecy) {
+        $app->get('/hello/{name}', function (
+            ServerRequestInterface $request,
+            array $args = []
+        ) use ($responseFactoryProphecy) {
             $response = $responseFactoryProphecy->reveal()->createResponse();
             $response->getBody()->write("Hello {$args['name']}");
+
             return $response;
         });
 
@@ -338,7 +350,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals('Hello World', (string) $response->getBody());
     }
 
-    public function testRouteNotFound()
+    public function testRouteNotFound(): void
     {
         $this->expectException(NotFoundException::class);
 
@@ -359,7 +371,7 @@ class ApplicationTest extends TestCase
         $app->handle($request);
     }
 
-    public function testRouteMatchingWithCallableRegisteredInContainer()
+    public function testRouteMatchingWithCallableRegisteredInContainer(): void
     {
         $responseProphecy = $this->prophesize(ResponseInterface::class);
         $responseProphecy->getBody()->willReturn('Hello World');
@@ -367,13 +379,14 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $handler = new Class($responseFactoryProphecy)
-        {
+        $handler = new class ($responseFactoryProphecy) {
             private $responseFactoryProphecy;
+
             public function __construct($responseFactoryProphecy)
             {
                 $this->responseFactoryProphecy = $responseFactoryProphecy;
             }
+
             public function __invoke(ServerRequestInterface $request)
             {
                 return $this->responseFactoryProphecy->reveal()->createResponse();
@@ -405,7 +418,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals('Hello World', (string) $response->getBody());
     }
 
-    public function testRouteMatchingWithArrayHandlerRegisteredInContainer()
+    public function testRouteMatchingWithArrayHandlerRegisteredInContainer(): void
     {
         $responseProphecy = $this->prophesize(ResponseInterface::class);
         $responseProphecy->getBody()->willReturn('Hello World');
@@ -413,13 +426,14 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $handler = new Class($responseFactoryProphecy)
-        {
+        $handler = new class ($responseFactoryProphecy) {
             private $responseFactoryProphecy;
+
             public function __construct($responseFactoryProphecy)
             {
                 $this->responseFactoryProphecy = $responseFactoryProphecy;
             }
+
             public function foo(ServerRequestInterface $request)
             {
                 return $this->responseFactoryProphecy->reveal()->createResponse();
@@ -451,7 +465,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals('Hello World', (string) $response->getBody());
     }
 
-    public function testRouteMatchingWithNonExistedMethodInArrayHandlerRegisteredInContainer()
+    public function testRouteMatchingWithNonExistedMethodInArrayHandlerRegisteredInContainer(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -461,8 +475,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $handler = new Class()
-        {
+        $handler = new class () {
         };
 
         $request = new ServerRequest(
@@ -491,7 +504,7 @@ class ApplicationTest extends TestCase
     {
         $streamProphecy = $this->prophesize(StreamInterface::class);
         $streamProphecy->__toString()->willReturn('');
-        $streamProphecy->write(Argument::type('string'))->will(function ($args) {
+        $streamProphecy->write(Argument::type('string'))->will(function ($args): void {
             $body = $this->reveal()->__toString();
             $body .= $args[0];
             $this->__toString()->willReturn($body);
@@ -507,6 +520,7 @@ class ApplicationTest extends TestCase
         function handle($request, ResponseInterface $response)
         {
             $response->getBody()->write('Hello World');
+
             return $response;
         }
 
@@ -520,7 +534,7 @@ class ApplicationTest extends TestCase
         $app = new Application(
             $responseFactoryProphecy->reveal()
         );
-        $app->get('/', __NAMESPACE__ . '\handle');
+        $app->get('/', __NAMESPACE__.'\handle');
 
         $app->add(new RouterMiddleware($app->getRouteCollector()));
         $app->add(DispatchMiddleware::class);
@@ -532,23 +546,21 @@ class ApplicationTest extends TestCase
 
     /**
      * @dataProvider routeGroupsDataProvider
-     * @param array  $sequence
-     * @param string $expectedPath
      */
-    public function testRouteGroupCombinations(array $sequence, string $expectedPath)
+    public function testRouteGroupCombinations(array $sequence, string $expectedPath): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $app = new Application($responseFactoryProphecy->reveal());
 
-        $processSequence = function (Application $app, array $sequence, $processSequence) {
+        $processSequence = function (Application $app, array $sequence, $processSequence): void {
             $path = array_shift($sequence);
 
             if (count($sequence)) {
-                $app->group($path, function () use ($app, &$sequence, $processSequence) {
+                $app->group($path, function () use ($app, &$sequence, $processSequence): void {
                     $processSequence($app, $sequence, $processSequence);
                 });
             } else {
-                $app->get($path, function () {
+                $app->get($path, function (): void {
                 });
             }
         };
@@ -561,14 +573,14 @@ class ApplicationTest extends TestCase
         $this->assertEquals($expectedPath, $route->getPath());
     }
 
-    public function testRouteGroupPattern()
+    public function testRouteGroupPattern(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
 
         /** @var ResponseFactoryInterface $responseFactoryInterface */
         $responseFactoryInterface = $responseFactoryProphecy->reveal();
         $app = new Application($responseFactoryInterface);
-        $group = $app->group('/foo', function () {
+        $group = $app->group('/foo', function (): void {
         });
 
         $this->assertEquals('/foo', $group->getPath());
@@ -577,11 +589,11 @@ class ApplicationTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testRun()
+    public function testRun(): void
     {
         $streamProphecy = $this->prophesize(StreamInterface::class);
         $streamProphecy->__toString()->willReturn('');
-        $streamProphecy->write(Argument::type('string'))->will(function ($args) {
+        $streamProphecy->write(Argument::type('string'))->will(function ($args): void {
             $body = $this->reveal()->__toString();
             $body .= $args[0];
             $this->__toString()->willReturn($body);
@@ -589,6 +601,7 @@ class ApplicationTest extends TestCase
         $streamProphecy->read(1)->willReturn('_');
         $streamProphecy->read('11')->will(function () {
             $this->eof()->willReturn(true);
+
             return $this->reveal()->__toString();
         });
         $streamProphecy->eof()->willReturn(false);
@@ -619,6 +632,7 @@ class ApplicationTest extends TestCase
         $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
             $response = $responseFactoryProphecy->reveal()->createResponse();
             $response->getBody()->write('Hello World');
+
             return $response;
         });
 
@@ -633,11 +647,11 @@ class ApplicationTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testRunWithoutPassingServerRequest()
+    public function testRunWithoutPassingServerRequest(): void
     {
         $streamProphecy = $this->prophesize(StreamInterface::class);
         $streamProphecy->__toString()->willReturn('');
-        $streamProphecy->write(Argument::type('string'))->will(function ($args) {
+        $streamProphecy->write(Argument::type('string'))->will(function ($args): void {
             $body = $this->reveal()->__toString();
             $body .= $args[0];
             $this->__toString()->willReturn($body);
@@ -645,6 +659,7 @@ class ApplicationTest extends TestCase
         $streamProphecy->read(1)->willReturn('_');
         $streamProphecy->read('11')->will(function () {
             $this->eof()->willReturn(true);
+
             return $this->reveal()->__toString();
         });
         $streamProphecy->eof()->willReturn(false);
@@ -679,6 +694,7 @@ class ApplicationTest extends TestCase
         $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
             $response = $responseFactoryProphecy->reveal()->createResponse();
             $response->getBody()->write('Hello World');
+
             return $response;
         });
 
@@ -699,7 +715,7 @@ class ApplicationTest extends TestCase
             ['PATCH'],
             ['DELETE'],
             ['OPTIONS'],
-            ['HEAD']
+            ['HEAD'],
         ];
     }
 
@@ -712,7 +728,7 @@ class ApplicationTest extends TestCase
             ['patch'],
             ['delete'],
             ['options'],
-            ['head']
+            ['head'],
         ];
     }
 
@@ -720,112 +736,112 @@ class ApplicationTest extends TestCase
     {
         return [
             'empty group with empty route' => [
-                ['', ''], ''
+                ['', ''], '',
             ],
             'empty group with single slash route' => [
-                ['', '/'], '/'
+                ['', '/'], '/',
             ],
             'empty group with segment route that does not end in aSlash' => [
-                ['', '/foo'], '/foo'
+                ['', '/foo'], '/foo',
             ],
             'empty group with segment route that ends in aSlash' => [
-                ['', '/foo/'], '/foo/'
+                ['', '/foo/'], '/foo/',
             ],
             'group single slash with empty route' => [
-                ['/', ''], '/'
+                ['/', ''], '/',
             ],
             'group single slash with single slash route' => [
-                ['/', '/'], '//'
+                ['/', '/'], '//',
             ],
             'group single slash with segment route that does not end in aSlash' => [
-                ['/', '/foo'], '//foo'
+                ['/', '/foo'], '//foo',
             ],
             'group single slash with segment route that ends in aSlash' => [
-                ['/', '/foo/'], '//foo/'
+                ['/', '/foo/'], '//foo/',
             ],
             'group segment with empty route' => [
-                ['/foo', ''], '/foo'
+                ['/foo', ''], '/foo',
             ],
             'group segment with single slash route' => [
-                ['/foo', '/'], '/foo/'
+                ['/foo', '/'], '/foo/',
             ],
             'group segment with segment route that does not end in aSlash' => [
-                ['/foo', '/bar'], '/foo/bar'
+                ['/foo', '/bar'], '/foo/bar',
             ],
             'group segment with segment route that ends in aSlash' => [
-                ['/foo', '/bar/'], '/foo/bar/'
+                ['/foo', '/bar/'], '/foo/bar/',
             ],
             'empty group with nested group segment with an empty route' => [
-                ['', '/foo', ''], '/foo'
+                ['', '/foo', ''], '/foo',
             ],
             'empty group with nested group segment with single slash route' => [
-                ['', '/foo', '/'], '/foo/'
+                ['', '/foo', '/'], '/foo/',
             ],
             'group single slash with empty nested group and segment route without leading slash' => [
-                ['/', '', 'foo'], '/foo'
+                ['/', '', 'foo'], '/foo',
             ],
             'group single slash with empty nested group and segment route' => [
-                ['/', '', '/foo'], '//foo'
+                ['/', '', '/foo'], '//foo',
             ],
             'group single slash with single slash group and segment route without leading slash' => [
-                ['/', '/', 'foo'], '//foo'
+                ['/', '/', 'foo'], '//foo',
             ],
             'group single slash with single slash nested group and segment route' => [
-                ['/', '/', '/foo'], '///foo'
+                ['/', '/', '/foo'], '///foo',
             ],
             'group single slash with nested group segment with an empty route' => [
-                ['/', '/foo', ''], '//foo'
+                ['/', '/foo', ''], '//foo',
             ],
             'group single slash with nested group segment with single slash route' => [
-                ['/', '/foo', '/'], '//foo/'
+                ['/', '/foo', '/'], '//foo/',
             ],
             'group single slash with nested group segment with segment route' => [
-                ['/', '/foo', '/bar'], '//foo/bar'
+                ['/', '/foo', '/bar'], '//foo/bar',
             ],
             'group single slash with nested group segment with segment route that has aTrailing slash' => [
-                ['/', '/foo', '/bar/'], '//foo/bar/'
+                ['/', '/foo', '/bar/'], '//foo/bar/',
             ],
             'empty group with empty nested group and segment route without leading slash' => [
-                ['', '', 'foo'], 'foo'
+                ['', '', 'foo'], 'foo',
             ],
             'empty group with empty nested group and segment route' => [
-                ['', '', '/foo'], '/foo'
+                ['', '', '/foo'], '/foo',
             ],
             'empty group with single slash group and segment route without leading slash' => [
-                ['', '/', 'foo'], '/foo'
+                ['', '/', 'foo'], '/foo',
             ],
             'empty group with single slash nested group and segment route' => [
-                ['', '/', '/foo'], '//foo'
+                ['', '/', '/foo'], '//foo',
             ],
             'empty group with nested group segment with segment route' => [
-                ['', '/foo', '/bar'], '/foo/bar'
+                ['', '/foo', '/bar'], '/foo/bar',
             ],
             'empty group with nested group segment with segment route that has aTrailing slash' => [
-                ['', '/foo', '/bar/'], '/foo/bar/'
+                ['', '/foo', '/bar/'], '/foo/bar/',
             ],
             'group segment with empty nested group and segment route without leading slash' => [
-                ['/foo', '', 'bar'], '/foobar'
+                ['/foo', '', 'bar'], '/foobar',
             ],
             'group segment with empty nested group and segment route' => [
-                ['/foo', '', '/bar'], '/foo/bar'
+                ['/foo', '', '/bar'], '/foo/bar',
             ],
             'group segment with single slash nested group and segment route' => [
-                ['/foo', '/', 'bar'], '/foo/bar'
+                ['/foo', '/', 'bar'], '/foo/bar',
             ],
             'group segment with single slash nested group and slash segment route' => [
-                ['/foo', '/', '/bar'], '/foo//bar'
+                ['/foo', '/', '/bar'], '/foo//bar',
             ],
             'two group segments with empty route' => [
-                ['/foo', '/bar', ''], '/foo/bar'
+                ['/foo', '/bar', ''], '/foo/bar',
             ],
             'two group segments with single slash route' => [
-                ['/foo', '/bar', '/'], '/foo/bar/'
+                ['/foo', '/bar', '/'], '/foo/bar/',
             ],
             'two group segments with segment route' => [
-                ['/foo', '/bar', '/baz'], '/foo/bar/baz'
+                ['/foo', '/bar', '/baz'], '/foo/bar/baz',
             ],
             'two group segments with segment route that has aTrailing slash' => [
-                ['/foo', '/bar', '/baz/'], '/foo/bar/baz/'
+                ['/foo', '/bar', '/baz/'], '/foo/bar/baz/',
             ],
         ];
     }

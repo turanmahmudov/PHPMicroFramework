@@ -86,7 +86,7 @@ final class RouteMatcher implements RouteMatcherInterface
         if (!file_exists($cacheFile)) {
             file_put_contents(
                 $cacheFile,
-                '<?php return '. var_export($this->getRouteCollector()->getData(), true).';'
+                '<?php return ' . var_export($this->getRouteCollector()->getData(), true) . ';'
             );
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Factory;
 
 use DI\ContainerBuilder;
@@ -22,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+
 use function DI\factory;
 
 class ContainerFactory
@@ -35,34 +38,37 @@ class ContainerFactory
     {
         $defaultConfig = [
             // PSR-17
-            ResponseFactoryInterface::class => function() {
+            ResponseFactoryInterface::class => function () {
                 return new ResponseFactory();
             },
-            ServerRequestFactoryInterface::class => function() {
+            ServerRequestFactoryInterface::class => function () {
                 return new ServerRequestFactory();
             },
-            StreamFactoryInterface::class => function() {
+            StreamFactoryInterface::class => function () {
                 return new StreamFactory();
             },
-            UriFactoryInterface::class => function() {
+            UriFactoryInterface::class => function () {
                 return new UriFactory();
             },
-            UploadedFileFactoryInterface::class => function() {
+            UploadedFileFactoryInterface::class => function () {
                 return new UploadedFileFactory();
             },
 
             // PSR-7
-            ResponseInterface::class => function(ResponseFactoryInterface $responseFactory) {
+            ResponseInterface::class => function (ResponseFactoryInterface $responseFactory) {
                 return $responseFactory->createResponse();
             },
-            ServerRequestInterface::class => function(ServerRequestFactoryInterface $serverRequestFactory) {
+            ServerRequestInterface::class => function (ServerRequestFactoryInterface $serverRequestFactory) {
                 return $serverRequestFactory::fromGlobals();
             },
 
             Application::class => factory(ApplicationFactory::class),
             MiddlewareDispatcherInterface::class => factory(MiddlewareDispatcherFactory::class),
             EmitterInterface::class => factory(EmitterFactory::class),
-            RouteCollectorInterface::class => function(ContainerInterface $container, ResponseFactoryInterface $responseFactory) {
+            RouteCollectorInterface::class => function (
+                ContainerInterface $container,
+                ResponseFactoryInterface $responseFactory
+            ) {
                 return new RouteCollector($container, $responseFactory);
             }
         ];

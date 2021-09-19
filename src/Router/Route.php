@@ -86,8 +86,7 @@ final class Route implements RouteInterface
         array $routeGroups = [],
         ?ContainerInterface $container = null,
         int $identifier = 0
-    )
-    {
+    ) {
         $this->method = $method;
         $this->path = $path;
         $this->requestHandler = $requestHandler;
@@ -166,7 +165,11 @@ final class Route implements RouteInterface
         if (is_string($requestHandler) && $this->container) {
             $requestHandler = $this->container->get($requestHandler);
         }
-        if (is_array($requestHandler) && count($requestHandler) === 2 && is_string($requestHandler[0]) && $this->container) {
+        if (
+            is_array($requestHandler) &&
+            count($requestHandler) === 2 &&
+            is_string($requestHandler[0]) && $this->container
+        ) {
             $requestHandler[0] = $this->container->get($requestHandler[0]);
         }
 
@@ -176,7 +179,8 @@ final class Route implements RouteInterface
 
         if (is_callable($requestHandler)) {
             if ($this->container && method_exists($this->container, 'call')) {
-                return $this->container->call($requestHandler,
+                return $this->container->call(
+                    $requestHandler,
                     [
                         'request' => $request,
                         'response' => $this->responseFactory->createResponse(),

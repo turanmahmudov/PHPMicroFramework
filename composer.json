@@ -30,9 +30,8 @@
         "php-coveralls/php-coveralls": "^2.4.3",
         "phploc/phploc": "^7.0.2",
         "phpstan/extension-installer": "^1.1",
-        "infection/infection": "^0.20.2",
         "phpspec/prophecy-phpunit": "^2.0",
-        "friendsofphp/php-cs-fixer": "^2.18.1"
+        "squizlabs/php_codesniffer": "3.*"
     },
     "autoload": {
         "psr-4": {
@@ -45,17 +44,15 @@
         }
     },
     "scripts": {
-        "fix:cs": "mkdir -p build && vendor/bin/php-cs-fixer fix --cache-file=build/phpcs.cache",
+        "fix:cs": "mkdir -p build && vendor/bin/phpcbf --cache=build/phpcs.cache",
         "test": [
             "@test:lint",
             "@test:unit",
-            "@test:infection",
             "@test:static-analysis",
             "@test:loc",
             "@test:cs"
         ],
-        "test:cs": "mkdir -p build && vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --cache-file=build/phpcs.cache",
-        "test:infection": "vendor/bin/infection --threads=$(nproc) --min-msi=100 --verbose --coverage=build/phpunit",
+        "test:cs": "mkdir -p build && vendor/bin/phpcs --cache=build/phpcs.cache",
         "test:lint": "mkdir -p build && find src tests -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php -l | tee build/phplint.log",
         "test:loc": "mkdir -p build && vendor/bin/phploc src | tee build/phploc.log",
         "test:static-analysis": "mkdir -p build && bash -c 'vendor/bin/phpstan analyse src --no-progress --level=8 --error-format=junit | tee build/phpstan.junit.xml; if [ ${PIPESTATUS[0]} -ne \"0\" ]; then exit 1; fi'",

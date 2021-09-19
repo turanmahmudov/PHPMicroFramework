@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Http;
 
 use Framework\Http\Exception\HttpExceptionInterface;
@@ -28,7 +30,7 @@ class Exception extends \Exception implements HttpExceptionInterface
     protected ?\Exception $previous;
 
     /**
-     * Exception constructor.
+     *
      * @param int $status
      * @param string $message
      * @param \Exception|null $previous
@@ -37,7 +39,7 @@ class Exception extends \Exception implements HttpExceptionInterface
      */
     public function __construct(
         int $status,
-        string $message = "",
+        string $message = '',
         \Exception $previous = null,
         array $headers = [],
         int $code = 0
@@ -58,7 +60,7 @@ class Exception extends \Exception implements HttpExceptionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return int
      */
     public function getStatusCode(): int
     {
@@ -66,7 +68,8 @@ class Exception extends \Exception implements HttpExceptionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
     public function buildJsonResponse(ResponseInterface $response): ResponseInterface
     {
@@ -79,8 +82,8 @@ class Exception extends \Exception implements HttpExceptionInterface
 
         if ($response->getBody()->isWritable()) {
             $response->getBody()->write(json_encode([
-                'status_code'   => $this->status,
-                'reason_phrase' => $this->message
+                'status_code' => $this->status,
+                'reason_phrase' => $this->message,
             ]));
         }
 

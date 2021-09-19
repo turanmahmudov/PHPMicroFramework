@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework;
 
 use Framework\Middleware\MiddlewareAwareTrait;
@@ -19,7 +21,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class Application implements MiddlewareInterface, RequestHandlerInterface
 {
-    use RouteAwareTrait, MiddlewareAwareTrait;
+    use RouteAwareTrait;
+    use MiddlewareAwareTrait;
 
     /**
      * @var ResponseFactoryInterface

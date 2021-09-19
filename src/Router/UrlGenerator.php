@@ -55,10 +55,10 @@ class UrlGenerator implements UrlGeneratorInterface
         $path = $this->generatePathFromAttributes($name, $routePartSets, $attributes, $routeIndex);
 
         if ([] === $queryParams) {
-            return $this->basePath.$path;
+            return $this->basePath . $path;
         }
 
-        return $this->basePath.$path.'?' . http_build_query($queryParams);
+        return $this->basePath . $path . '?' . http_build_query($queryParams);
     }
 
     /**
@@ -108,8 +108,12 @@ class UrlGenerator implements UrlGeneratorInterface
      * @param int $routeIndex
      * @return string
      */
-    protected function generatePathFromAttributes(string $name, array $routePartSets, array $attributes, int $routeIndex)
-    {
+    protected function generatePathFromAttributes(
+        string $name,
+        array $routePartSets,
+        array $attributes,
+        int $routeIndex
+    ) {
         $pathParts = [];
 
         foreach ($routePartSets[$routeIndex] as $routePart) {
@@ -134,14 +138,28 @@ class UrlGenerator implements UrlGeneratorInterface
         $attribute = $routePart[0];
 
         if (!isset($attributes[$attribute])) {
-            throw new RuntimeException(sprintf('Missing attribute "%s" while path generation for route: "%s"', $attribute, $name));
+            throw new RuntimeException(
+                sprintf(
+                    'Missing attribute "%s" while path generation for route: "%s"',
+                    $attribute,
+                    $name
+                )
+            );
         }
 
         $value = (string) $attributes[$attribute];
-        $pattern = '!^'.$routePart[1].'$!';
+        $pattern = '!^' . $routePart[1] . '$!';
 
         if (1 !== preg_match($pattern, $value)) {
-            throw new RuntimeException(sprintf('Not matching value "%s" with pattern "%s" on attribute "%s" while path generation for route: "%s"', $name, $attribute, $value, $routePart[1]));
+            throw new RuntimeException(
+                sprintf(
+                    'Not matching value "%s" with pattern "%s" on attr "%s" while path generation for route: "%s"',
+                    $name,
+                    $attribute,
+                    $value,
+                    $routePart[1]
+                )
+            );
         }
 
         return $value;

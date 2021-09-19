@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Factory;
 
 use Framework\Application;
@@ -17,6 +19,14 @@ class ApplicationFactory
      */
     protected static ?ResponseFactoryInterface $responseFactory;
 
+    /**
+     * @param ResponseFactoryInterface|null $responseFactory
+     * @param ContainerInterface|null $container
+     * @param RouteCollector|null $routeCollector
+     * @param MiddlewareDispatcherInterface|null $middlewareDispatcher
+     * @param EmitterInterface|null $responseEmitter
+     * @return Application
+     */
     public function __invoke(
         ?ResponseFactoryInterface $responseFactory = null,
         ?ContainerInterface $container = null,
