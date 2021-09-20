@@ -21,4 +21,9 @@ interface GroupInterface
      * @return string
      */
     public function getPath(): string;
+
+    /**
+     * @return array<mixed>
+     */
+    public function getMiddlewares(): array;
 }

@@ -28,10 +28,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 
-/**
- * @internal
- * @coversNothing
- */
 class ApplicationTest extends TestCase
 {
     use ProphecyTrait;
@@ -690,6 +686,57 @@ class ApplicationTest extends TestCase
         $app = new Application(
             $responseFactoryProphecy->reveal(),
             $containerProphecy->reveal()
+        );
+        $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
+            $response = $responseFactoryProphecy->reveal()->createResponse();
+            $response->getBody()->write('Hello World');
+
+            return $response;
+        });
+
+        $app->add(new RouterMiddleware($app->getRouteCollector()));
+        $app->add(new DispatchMiddleware());
+
+        $app->run();
+
+        $this->expectOutputString('Hello World');
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testRunWithoutPassingServerRequestAndWithoutContainer(): void
+    {
+        $streamProphecy = $this->prophesize(StreamInterface::class);
+        $streamProphecy->__toString()->willReturn('');
+        $streamProphecy->write(Argument::type('string'))->will(function ($args): void {
+            $body = $this->reveal()->__toString();
+            $body .= $args[0];
+            $this->__toString()->willReturn($body);
+        });
+        $streamProphecy->read(1)->willReturn('_');
+        $streamProphecy->read('11')->will(function () {
+            $this->eof()->willReturn(true);
+
+            return $this->reveal()->__toString();
+        });
+        $streamProphecy->eof()->willReturn(false);
+        $streamProphecy->isSeekable()->willReturn(true);
+        $streamProphecy->rewind()->willReturn(true);
+
+        $responseProphecy = $this->prophesize(ResponseInterface::class);
+        $responseProphecy->getBody()->willReturn($streamProphecy->reveal());
+        $responseProphecy->getStatusCode()->willReturn(200);
+        $responseProphecy->getHeaders()->willReturn(['Content-Length' => ['11']]);
+        $responseProphecy->getProtocolVersion()->willReturn('1.1');
+        $responseProphecy->getReasonPhrase()->willReturn('');
+        $responseProphecy->getHeaderLine('Content-Length')->willReturn('11');
+
+        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
+        $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
+
+        $app = new Application(
+            $responseFactoryProphecy->reveal()
         );
         $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
             $response = $responseFactoryProphecy->reveal()->createResponse();

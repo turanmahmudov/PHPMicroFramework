@@ -194,4 +194,12 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     {
         return $this->process($request, $this->handler);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
 }

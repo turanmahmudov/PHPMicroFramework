@@ -4,6 +4,7 @@ namespace Framework\Middleware;
 
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use SplQueue;
 
 interface MiddlewareDispatcherInterface extends MiddlewareInterface, RequestHandlerInterface
 {
@@ -12,4 +13,9 @@ interface MiddlewareDispatcherInterface extends MiddlewareInterface, RequestHand
      * @return MiddlewareDispatcherInterface
      */
     public function add($middleware);
+
+    /**
+     * @return SplQueue
+     */
+    public function getMiddleware();
 }

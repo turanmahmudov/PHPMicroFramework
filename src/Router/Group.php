@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Router;
 
 use Framework\Middleware\MiddlewareDispatcherInterface;
@@ -81,7 +83,7 @@ final class Group implements GroupInterface
     }
 
     /**
-     * @return array<mixed>
+     * {@inheritDoc}
      */
     public function getMiddlewares(): array
     {
@@ -89,7 +91,7 @@ final class Group implements GroupInterface
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getPath(): string
     {
