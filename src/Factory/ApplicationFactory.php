@@ -6,7 +6,7 @@ namespace Framework\Factory;
 
 use Framework\Application;
 use Framework\Middleware\MiddlewareDispatcherInterface;
-use Framework\Router\RouteCollector;
+use Framework\Router\RouteCollectorInterface;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Psr\Container\ContainerInterface;
@@ -22,7 +22,7 @@ class ApplicationFactory
     /**
      * @param ResponseFactoryInterface|null $responseFactory
      * @param ContainerInterface|null $container
-     * @param RouteCollector|null $routeCollector
+     * @param RouteCollectorInterface|null $routeCollector
      * @param MiddlewareDispatcherInterface|null $middlewareDispatcher
      * @param EmitterInterface|null $responseEmitter
      * @return Application
@@ -30,7 +30,7 @@ class ApplicationFactory
     public function __invoke(
         ?ResponseFactoryInterface $responseFactory = null,
         ?ContainerInterface $container = null,
-        ?RouteCollector $routeCollector = null,
+        ?RouteCollectorInterface $routeCollector = null,
         ?MiddlewareDispatcherInterface $middlewareDispatcher = null,
         ?EmitterInterface $responseEmitter = null
     ): Application {
