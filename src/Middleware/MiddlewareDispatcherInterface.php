@@ -12,10 +12,10 @@ interface MiddlewareDispatcherInterface extends MiddlewareInterface, RequestHand
      * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
      * @return MiddlewareDispatcherInterface
      */
-    public function add($middleware);
+    public function add($middleware): MiddlewareDispatcherInterface;
 
     /**
      * @return SplQueue
      */
-    public function getMiddleware();
+    public function getMiddleware(): SplQueue;
 }

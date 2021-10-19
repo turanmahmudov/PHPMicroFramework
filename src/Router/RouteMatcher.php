@@ -2,7 +2,6 @@
 
 namespace Framework\Router;
 
-use Exception;
 use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 use FastRoute\RouteParser\Std as RouteParser;

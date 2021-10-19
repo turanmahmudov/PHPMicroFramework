@@ -45,7 +45,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     /**
      * {@inheritDoc}
      */
-    public function add($middleware)
+    public function add($middleware): MiddlewareDispatcherInterface
     {
         if (is_string($middleware)) {
             if ($this->container) {
@@ -198,7 +198,7 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     /**
      * {@inheritDoc}
      */
-    public function getMiddleware()
+    public function getMiddleware(): SplQueue
     {
         return $this->middleware;
     }

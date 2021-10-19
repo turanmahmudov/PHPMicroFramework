@@ -68,11 +68,7 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     protected function getRoute(string $name): RouteInterface
     {
-        try {
-            $this->routeCollector->getNamedRoute($name);
-        } catch (RuntimeException $exception) {
-            throw $exception;
-        }
+        $this->routeCollector->getNamedRoute($name);
 
         return $this->routeCollector->getNamedRoute($name);
     }
@@ -82,7 +78,7 @@ class UrlGenerator implements UrlGeneratorInterface
      * @param array<string> $attributes
      * @return ?int
      */
-    protected function getRouteIndex(array $routePartSets, array $attributes)
+    protected function getRouteIndex(array $routePartSets, array $attributes): ?int
     {
         foreach ($routePartSets as $routeIndex => $routeParts) {
             foreach ($routeParts as $routePart) {
@@ -113,7 +109,7 @@ class UrlGenerator implements UrlGeneratorInterface
         array $routePartSets,
         array $attributes,
         ?int $routeIndex
-    ) {
+    ): string {
         $pathParts = [];
 
         foreach ($routePartSets[$routeIndex] as $routePart) {

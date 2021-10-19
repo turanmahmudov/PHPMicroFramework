@@ -9,7 +9,7 @@ interface RouteCollectorInterface
     /**
      * @param string $method
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function map(string $method, string $pattern, $handler): RouteInterface;

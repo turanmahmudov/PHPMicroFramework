@@ -21,7 +21,7 @@ final class Group implements GroupInterface
     protected $callable;
 
     /**
-     * @var array<mixed>
+     * @var array
      */
     protected array $middlewares = [];
 

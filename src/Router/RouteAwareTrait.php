@@ -13,7 +13,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function get(string $pattern, $handler): RouteInterface
@@ -23,7 +23,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function post(string $pattern, $handler): RouteInterface
@@ -33,7 +33,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function delete(string $pattern, $handler): RouteInterface
@@ -43,7 +43,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function head(string $pattern, $handler): RouteInterface
@@ -53,7 +53,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function options(string $pattern, $handler): RouteInterface
@@ -63,7 +63,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function patch(string $pattern, $handler): RouteInterface
@@ -73,7 +73,7 @@ trait RouteAwareTrait
 
     /**
      * @param string $pattern
-     * @param string|callable|array<mixed>|RequestHandlerInterface $handler
+     * @param string|callable|array|RequestHandlerInterface $handler
      * @return RouteInterface
      */
     public function put(string $pattern, $handler): RouteInterface

@@ -30,7 +30,7 @@ use function DI\factory;
 class ContainerFactory
 {
     /**
-     * @param array<mixed, mixed> $containerConfig
+     * @param array $containerConfig
      * @return ContainerInterface
      * @throws Exception
      */
@@ -67,7 +67,7 @@ class ContainerFactory
                     // @TODO I have to add factory providers to create ServerRequest
                     $serverRequestFactory->createServerRequest(
                         $_SERVER['REQUEST_METHOD'],
-                        $uriFactory->createUri(''),
+                        $uriFactory->createUri(),
                         $_SERVER
                     );
             },

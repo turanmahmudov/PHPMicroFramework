@@ -23,7 +23,7 @@ interface GroupInterface
     public function getPath(): string;
 
     /**
-     * @return array<mixed>
+     * @return array
      */
     public function getMiddlewares(): array;
 }

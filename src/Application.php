@@ -10,7 +10,6 @@ use Framework\Router\RouteAwareTrait;
 use Framework\Router\RouteCollectorInterface;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
-use Laminas\HttpHandlerRunner\Emitter\EmitterStack;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;

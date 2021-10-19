@@ -11,7 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
@@ -37,7 +36,7 @@ final class Route implements RouteInterface
      */
     protected string $path;
 
-    /** @var string|callable|array<mixed>|RequestHandlerInterface|MiddlewareInterface */
+    /** @var string|callable|array|RequestHandlerInterface|MiddlewareInterface */
     protected $requestHandler;
 
     /**
@@ -73,7 +72,7 @@ final class Route implements RouteInterface
     /**
      * @param string $method
      * @param string $path
-     * @param string|callable|array<mixed>|RequestHandlerInterface|MiddlewareInterface $requestHandler
+     * @param string|callable|array|RequestHandlerInterface|MiddlewareInterface $requestHandler
      * @param ResponseFactoryInterface $responseFactory
      * @param array<GroupInterface> $routeGroups
      * @param ContainerInterface|null $container
@@ -105,7 +104,7 @@ final class Route implements RouteInterface
     /**
      * @param string $method
      * @param string $path
-     * @param string|callable|array<mixed>|RequestHandlerInterface $requestHandler
+     * @param string|callable|array|RequestHandlerInterface $requestHandler
      * @param ResponseFactoryInterface $responseFactory
      * @param array<GroupInterface> $routeGroups
      * @param ContainerInterface|null $container
