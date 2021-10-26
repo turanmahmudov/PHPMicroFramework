@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Router;
 
 use Psr\Container\ContainerInterface;
@@ -17,6 +19,11 @@ class RouteCollector implements RouteCollectorInterface
      * @var ResponseFactoryInterface
      */
     protected ResponseFactoryInterface $responseFactory;
+
+    /**
+     * @var RouterInterface
+     */
+    protected RouterInterface $router;
 
     /**
      * @var array<string, RouteInterface>
@@ -52,11 +59,16 @@ class RouteCollector implements RouteCollectorInterface
     /**
      * @param ContainerInterface|null $container
      * @param ResponseFactoryInterface $responseFactory
+     * @param RouterInterface $router
      */
-    public function __construct(?ContainerInterface $container, ResponseFactoryInterface $responseFactory)
-    {
+    public function __construct(
+        ?ContainerInterface $container,
+        ResponseFactoryInterface $responseFactory,
+        RouterInterface $router
+    ) {
         $this->container = $container;
         $this->responseFactory = $responseFactory;
+        $this->router = $router;
     }
 
     /**
@@ -77,6 +89,8 @@ class RouteCollector implements RouteCollectorInterface
         );
         $this->routes[$route->getIdentifier()] = $route;
         $this->routeCounter++;
+
+        $this->router->addRoute($route);
 
         return $route;
     }
@@ -147,19 +161,19 @@ class RouteCollector implements RouteCollectorInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getRouteMatcher(): RouteMatcherInterface
-    {
-        return new RouteMatcher($this->routes);
-    }
-
-    /**
      * @param string $path
      * @return string
      */
     protected function parseRoutePath(string $path): string
     {
         return preg_replace(array_keys($this->patternMatchers), array_values($this->patternMatchers), $path) ?: $path;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRouter(): RouterInterface
+    {
+        return $this->router;
     }
 }

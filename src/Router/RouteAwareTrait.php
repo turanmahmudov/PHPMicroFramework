@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Router;
 
 use Psr\Http\Server\RequestHandlerInterface;
@@ -97,7 +99,7 @@ trait RouteAwareTrait
     public function getRouteCollector(): RouteCollectorInterface
     {
         return $this->routeCollector ??
-            $this->routeCollector = new RouteCollector(
+            $this->routeCollector = (new RouteCollectorFactory())(
                 $this->getContainer(),
                 $this->responseFactory
             );

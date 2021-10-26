@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Router;
 
 use Exception;
@@ -34,7 +36,7 @@ class RouterMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $routerResults = $this->routeCollector->getRouteMatcher()->match($request);
+        $routerResults = $this->routeCollector->getRouter()->match($request);
         $routeStatus = $routerResults->getRouteStatus();
 
         $request = $request->withAttribute(RouterResults::class, $routerResults);

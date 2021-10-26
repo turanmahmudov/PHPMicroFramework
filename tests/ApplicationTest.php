@@ -11,8 +11,10 @@ use Framework\Middleware\EmptyPipelineHandler;
 use Framework\Middleware\MiddlewareDispatcher;
 use Framework\Middleware\MiddlewareDispatcherInterface;
 use Framework\Router\DispatchMiddleware;
+use Framework\Router\FastRoute\RouterFactory;
 use Framework\Router\RouteCollector;
 use Framework\Router\RouteCollectorInterface;
+use Framework\Router\RouterInterface;
 use Framework\Router\RouterMiddleware;
 use Laminas\Diactoros\ServerRequest;
 use OutOfBoundsException;
@@ -79,7 +81,13 @@ class ApplicationTest extends TestCase
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
-        $routeCollector = new RouteCollector($containerProphecy->reveal(), $responseFactoryProphecy->reveal());
+        $router = (new RouterFactory())($containerProphecy->reveal());
+
+        $routeCollector = new RouteCollector(
+            $containerProphecy->reveal(),
+            $responseFactoryProphecy->reveal(),
+            $router
+        );
         $app = new Application(
             $responseFactoryProphecy->reveal(),
             $containerProphecy->reveal(),
@@ -399,6 +407,8 @@ class ApplicationTest extends TestCase
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
         $containerProphecy->get('handler')->willReturn($handler);
+        $containerProphecy->has('config')->willReturn(false);
+        $containerProphecy->has(RouterInterface::class)->willReturn(false);
 
         $app = new Application(
             $responseFactoryProphecy->reveal(),
@@ -446,6 +456,8 @@ class ApplicationTest extends TestCase
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
         $containerProphecy->get('handler')->willReturn($handler);
+        $containerProphecy->has('config')->willReturn(false);
+        $containerProphecy->has(RouterInterface::class)->willReturn(false);
 
         $app = new Application(
             $responseFactoryProphecy->reveal(),
@@ -484,6 +496,8 @@ class ApplicationTest extends TestCase
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
         $containerProphecy->get('handler')->willReturn($handler);
+        $containerProphecy->has('config')->willReturn(false);
+        $containerProphecy->has(RouterInterface::class)->willReturn(false);
 
         $app = new Application(
             $responseFactoryProphecy->reveal(),
@@ -682,6 +696,8 @@ class ApplicationTest extends TestCase
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->get(ServerRequestInterface::class)->willReturn($request);
+        $containerProphecy->has('config')->willReturn(false);
+        $containerProphecy->has(RouterInterface::class)->willReturn(false);
 
         $app = new Application(
             $responseFactoryProphecy->reveal(),

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Framework\Router;
 
 use Psr\Http\Server\RequestHandlerInterface;
@@ -39,7 +41,7 @@ interface RouteCollectorInterface
     public function getRoutes(): array;
 
     /**
-     * @return RouteMatcherInterface
+     * @return RouterInterface
      */
-    public function getRouteMatcher(): RouteMatcherInterface;
+    public function getRouter(): RouterInterface;
 }
