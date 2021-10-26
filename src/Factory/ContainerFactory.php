@@ -8,8 +8,10 @@ use DI\ContainerBuilder;
 use Exception;
 use Framework\Application;
 use Framework\Middleware\MiddlewareDispatcherInterface;
-use Framework\Router\RouteCollector;
+use Framework\Router\FastRoute\RouterFactory;
 use Framework\Router\RouteCollectorInterface;
+use Framework\Router\RouteCollectorFactory;
+use Framework\Router\RouterInterface;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
@@ -75,12 +77,8 @@ class ContainerFactory
             Application::class => factory(ApplicationFactory::class),
             MiddlewareDispatcherInterface::class => factory(MiddlewareDispatcherFactory::class),
             EmitterInterface::class => factory(EmitterFactory::class),
-            RouteCollectorInterface::class => function (
-                ContainerInterface $container,
-                ResponseFactoryInterface $responseFactory
-            ) {
-                return new RouteCollector($container, $responseFactory);
-            }
+            RouteCollectorInterface::class => factory(RouteCollectorFactory::class),
+            RouterInterface::class => factory(RouterFactory::class)
         ];
 
         $containerConfig = array_merge($defaultConfig, $containerConfig);
