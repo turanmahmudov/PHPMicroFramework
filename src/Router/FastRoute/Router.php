@@ -53,7 +53,7 @@ class Router implements RouterInterface
 
     public function addRoute(RouteInterface $route): void
     {
-        $this->routes[$route->getName()] = $route;
+        $this->routes[] = $route;
 
         $this->router->addRoute($route->getMethod(), $route->getPath(), $route->getIdentifier());
     }
@@ -101,14 +101,18 @@ class Router implements RouterInterface
      */
     public function generateUrl(string $name = "", array $attributes = [], array $queryParams = []): string
     {
-        if (!array_key_exists($name, $this->routes)) {
+        $route = array_filter($this->routes, function ($route) use ($name) {
+            return ($route->getName() == $name);
+        });
+
+        $route = reset($route);
+
+        if (!$route instanceof RouteInterface) {
             throw new RuntimeException(sprintf(
                 'Cannot generate URI for route "%s"; route not found',
                 $name
             ));
         }
-
-        $route = $this->routes[$name];
 
         $routeParser = new RouteParser();
         $routes = array_reverse($routeParser->parse($route->getPath()));
