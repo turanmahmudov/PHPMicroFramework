@@ -17,6 +17,12 @@ interface RouteInterface extends RequestHandlerInterface
     public function run(ServerRequestInterface $request): ResponseInterface;
 
     /**
+     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
+     * @return RouteInterface
+     */
+    public function add($middleware): RouteInterface;
+
+    /**
      * @param string $name
      * @return RouteInterface
      */

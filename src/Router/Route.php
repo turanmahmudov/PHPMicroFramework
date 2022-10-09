@@ -126,8 +126,7 @@ final class Route implements RouteInterface
     }
 
     /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return RouteInterface
+     * {@inheritDoc}
      */
     public function add($middleware): RouteInterface
     {
