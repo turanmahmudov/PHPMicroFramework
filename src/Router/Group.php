@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Framework\Router;
 
 use Framework\Middleware\MiddlewareDispatcherInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 final class Group implements GroupInterface
 {
