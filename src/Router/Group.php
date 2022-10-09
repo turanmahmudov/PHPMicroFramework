@@ -56,8 +56,7 @@ final class Group implements GroupInterface
     }
 
     /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return GroupInterface
+     * {@inheritDoc}
      */
     public function add($middleware): GroupInterface
     {

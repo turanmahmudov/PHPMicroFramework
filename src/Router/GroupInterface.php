@@ -9,6 +9,12 @@ use Framework\Middleware\MiddlewareDispatcherInterface;
 interface GroupInterface
 {
     /**
+     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
+     * @return GroupInterface
+     */
+    public function add($middleware): GroupInterface;
+
+    /**
      * @param MiddlewareDispatcherInterface $dispatcher
      * @return GroupInterface
      */
