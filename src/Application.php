@@ -80,6 +80,7 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
             if ($this->getContainer() instanceof ContainerInterface) {
                 $request = $this->getContainer()->get(ServerRequestInterface::class);
             } else {
+                // FIXME
                 $request = ServerRequestFactory::fromGlobals();
             }
         }
