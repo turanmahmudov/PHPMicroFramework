@@ -20,9 +20,7 @@ use Laminas\Diactoros\UriFactory;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -54,24 +52,6 @@ class ContainerFactory
             },
             UploadedFileFactoryInterface::class => function () {
                 return new UploadedFileFactory();
-            },
-
-            // PSR-7
-            ResponseInterface::class => function (ResponseFactoryInterface $responseFactory) {
-                return $responseFactory->createResponse();
-            },
-            ServerRequestInterface::class => function (
-                ServerRequestFactoryInterface $serverRequestFactory,
-                UriFactoryInterface $uriFactory
-            ) {
-                return method_exists($serverRequestFactory, 'fromGlobals') ?
-                    $serverRequestFactory::fromGlobals() :
-                    // @TODO I have to add factory providers to create ServerRequest
-                    $serverRequestFactory->createServerRequest(
-                        $_SERVER['REQUEST_METHOD'],
-                        $uriFactory->createUri(),
-                        $_SERVER
-                    );
             },
 
             Application::class => factory(ApplicationFactory::class),
