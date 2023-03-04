@@ -8,10 +8,6 @@ use Psr\Http\Message\ResponseInterface;
 
 interface HttpExceptionInterface
 {
-    /**
-     * @param ResponseInterface $response
-     * @return ResponseInterface
-     */
     public function buildJsonResponse(ResponseInterface $response): ResponseInterface;
 
     /**
@@ -19,8 +15,5 @@ interface HttpExceptionInterface
      */
     public function getHeaders(): array;
 
-    /**
-     * @return int
-     */
     public function getStatusCode(): int;
 }

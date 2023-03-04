@@ -19,23 +19,12 @@ class Exception extends \Exception implements HttpExceptionInterface
      */
     protected $message;
 
-    /**
-     * @var int
-     */
     protected int $status;
 
-    /**
-     * @var \Exception|null
-     */
     protected ?\Exception $previous;
 
     /**
-     *
-     * @param int $status
-     * @param string $message
-     * @param \Exception|null $previous
      * @param array<string, mixed> $headers
-     * @param int $code
      */
     public function __construct(
         int $status,
@@ -51,26 +40,16 @@ class Exception extends \Exception implements HttpExceptionInterface
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @return int
-     */
     public function getStatusCode(): int
     {
         return $this->status;
     }
 
-    /**
-     * @param ResponseInterface $response
-     * @return ResponseInterface
-     */
     public function buildJsonResponse(ResponseInterface $response): ResponseInterface
     {
         $this->headers['content-type'] = 'application/json';

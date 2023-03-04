@@ -7,39 +7,28 @@ namespace Framework\Router;
 use ArgumentsResolver\InDepthArgumentsResolver;
 use Framework\Middleware\MiddlewareDispatcher;
 use Framework\Middleware\MiddlewareDispatcherInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionException;
 use RuntimeException;
 
 final class Route implements RouteInterface
 {
-    /**
-     * @var string
-     */
     protected string $identifier;
 
-    /**
-     * @var string
-     */
     protected string $name = '';
 
-    /**
-     * @var string
-     */
     protected string $method;
 
-    /**
-     * @var string
-     */
     protected string $path;
 
-    /** @var string|callable|array|RequestHandlerInterface|MiddlewareInterface */
-    protected $requestHandler;
+    /** @var RequestHandlerInterface|callable|string|array<string, string> */
+    protected mixed $requestHandler;
 
     /**
      * @var array<string, mixed>
@@ -51,39 +40,22 @@ final class Route implements RouteInterface
      */
     protected array $groups;
 
-    /**
-     * @var MiddlewareDispatcherInterface
-     */
     protected MiddlewareDispatcherInterface $middlewareDispatcher;
 
-    /**
-     * @var ContainerInterface|null
-     */
     protected ?ContainerInterface $container;
 
-    /**
-     * @var ResponseFactoryInterface
-     */
     protected ResponseFactoryInterface $responseFactory;
 
-    /**
-     * @var bool
-     */
     protected bool $groupMiddlewareAppended = false;
 
     /**
-     * @param string $method
-     * @param string $path
-     * @param string|callable|array|RequestHandlerInterface|MiddlewareInterface $requestHandler
-     * @param ResponseFactoryInterface $responseFactory
+     * @param RequestHandlerInterface|callable|string|array<string, string> $requestHandler
      * @param array<GroupInterface> $routeGroups
-     * @param ContainerInterface|null $container
-     * @param int $identifier
      */
     public function __construct(
         string $method,
         string $path,
-        $requestHandler,
+        RequestHandlerInterface|callable|string|array $requestHandler,
         ResponseFactoryInterface $responseFactory,
         array $routeGroups = [],
         ?ContainerInterface $container = null,
@@ -104,19 +76,13 @@ final class Route implements RouteInterface
     }
 
     /**
-     * @param string $method
-     * @param string $path
-     * @param string|callable|array|RequestHandlerInterface $requestHandler
-     * @param ResponseFactoryInterface $responseFactory
+     * @param RequestHandlerInterface|callable|string|array<string, string> $requestHandler
      * @param array<GroupInterface> $routeGroups
-     * @param ContainerInterface|null $container
-     * @param int $identifier
-     * @return Route
      */
     public static function create(
         string $method,
         string $path,
-        $requestHandler,
+        RequestHandlerInterface|callable|string|array $requestHandler,
         ResponseFactoryInterface $responseFactory,
         array $routeGroups = [],
         ?ContainerInterface $container = null,
@@ -126,7 +92,8 @@ final class Route implements RouteInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function add($middleware): RouteInterface
     {
@@ -142,9 +109,6 @@ final class Route implements RouteInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function run(ServerRequestInterface $request): ResponseInterface
     {
         if (!$this->groupMiddlewareAppended) {
@@ -155,9 +119,9 @@ final class Route implements RouteInterface
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -189,11 +153,16 @@ final class Route implements RouteInterface
                     ]
                 );
             } else {
-                return call_user_func_array($requestHandler, (new InDepthArgumentsResolver($requestHandler))->resolve([
-                    'request' => $request,
-                    'response' => $this->responseFactory->createResponse(),
-                    'args' => $this->getAttributes()
-                ]));
+                return call_user_func_array(
+                    $requestHandler,
+                    (new InDepthArgumentsResolver($requestHandler))->resolve(
+                        [
+                            'request' => $request,
+                            'response' => $this->responseFactory->createResponse(),
+                            'args' => $this->getAttributes(),
+                        ]
+                    )
+                );
             }
         }
 
@@ -242,7 +211,7 @@ final class Route implements RouteInterface
         return $this->path;
     }
 
-    public function getRequestHandler()
+    public function getRequestHandler(): RequestHandlerInterface|callable|string|array
     {
         return $this->requestHandler;
     }

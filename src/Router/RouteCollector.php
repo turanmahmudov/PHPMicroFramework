@@ -6,33 +6,16 @@ namespace Framework\Router;
 
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 
 class RouteCollector implements RouteCollectorInterface
 {
     /**
-     * @var ContainerInterface|null
-     */
-    protected ?ContainerInterface $container;
-
-    /**
-     * @var ResponseFactoryInterface
-     */
-    protected ResponseFactoryInterface $responseFactory;
-
-    /**
-     * @var RouterInterface
-     */
-    protected RouterInterface $router;
-
-    /**
      * @var array<string, RouteInterface>
      */
     protected array $routes = [];
 
-    /**
-     * @var string
-     */
     protected string $groupPattern = '';
 
     /**
@@ -40,9 +23,6 @@ class RouteCollector implements RouteCollectorInterface
      */
     protected array $routeGroups = [];
 
-    /**
-     * @var int
-     */
     protected int $routeCounter = 0;
 
     /**
@@ -56,26 +36,18 @@ class RouteCollector implements RouteCollectorInterface
         '/{(.+?):uuid}/'          => '{$1:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}+}'
     ];
 
-    /**
-     * @param ContainerInterface|null $container
-     * @param ResponseFactoryInterface $responseFactory
-     * @param RouterInterface $router
-     */
     public function __construct(
-        ?ContainerInterface $container,
-        ResponseFactoryInterface $responseFactory,
-        RouterInterface $router
+        protected ?ContainerInterface $container,
+        protected ResponseFactoryInterface $responseFactory,
+        protected RouterInterface $router
     ) {
-        $this->container = $container;
-        $this->responseFactory = $responseFactory;
-        $this->router = $router;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function map(string $method, string $pattern, $handler): RouteInterface
-    {
+    public function map(
+        string $method,
+        string $pattern,
+        RequestHandlerInterface|callable|string|array $handler
+    ): RouteInterface {
         $pattern = $this->parseRoutePath($this->groupPattern . $pattern);
 
         $route = Route::create(
@@ -95,9 +67,6 @@ class RouteCollector implements RouteCollectorInterface
         return $route;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function group(string $pattern, callable $callback): Group
     {
         $currentGroupPattern = $this->groupPattern;
@@ -114,11 +83,6 @@ class RouteCollector implements RouteCollectorInterface
         return $routeGroup;
     }
 
-    /**
-     * @param string $alias
-     * @param string $regex
-     * @return RouteCollectorInterface
-     */
     public function addPatternMatcher(string $alias, string $regex): RouteCollectorInterface
     {
         $pattern = '/{(.+?):' . $alias . '}/';
@@ -127,9 +91,6 @@ class RouteCollector implements RouteCollectorInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function lookupRoute(string $identifier): RouteInterface
     {
         if (!isset($this->routes[$identifier])) {
@@ -138,9 +99,6 @@ class RouteCollector implements RouteCollectorInterface
         return $this->routes[$identifier];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getNamedRoute(string $name): RouteInterface
     {
         foreach ($this->routes as $route) {
@@ -152,26 +110,16 @@ class RouteCollector implements RouteCollectorInterface
         throw new RuntimeException('Named route does not exist for name: ' . $name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRoutes(): array
     {
         return $this->routes;
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     protected function parseRoutePath(string $path): string
     {
         return preg_replace(array_keys($this->patternMatchers), array_values($this->patternMatchers), $path) ?: $path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRouter(): RouterInterface
     {
         return $this->router;

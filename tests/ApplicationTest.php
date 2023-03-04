@@ -16,7 +16,7 @@ use Framework\Router\RouteCollector;
 use Framework\Router\RouteCollectorInterface;
 use Framework\Router\RouterInterface;
 use Framework\Router\RouterMiddleware;
-use Laminas\Diactoros\ServerRequest;
+use Http\Discovery\Psr17Factory;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -229,12 +229,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => $method],
-            [],
-            '/',
-            $method
-        );
+        $request = $this->generateServerRequest($method);
 
         $methodName = strtolower($method);
         $app = new Application(
@@ -261,12 +256,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'POST'],
-            [],
-            '/',
-            'POST'
-        );
+        $request = $this->generateServerRequest('POST');
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -288,12 +278,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -326,12 +311,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/hello/World',
-            'GET'
-        );
+        $request = $this->generateServerRequest('GET', '/hello/World');
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -360,12 +340,7 @@ class ApplicationTest extends TestCase
 
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -397,12 +372,7 @@ class ApplicationTest extends TestCase
             }
         };
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
@@ -446,12 +416,7 @@ class ApplicationTest extends TestCase
             }
         };
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
@@ -486,12 +451,7 @@ class ApplicationTest extends TestCase
         $handler = new class () {
         };
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('handler')->willReturn(true);
@@ -534,12 +494,7 @@ class ApplicationTest extends TestCase
             return $response;
         }
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -629,12 +584,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $app = new Application(
             $responseFactoryProphecy->reveal()
@@ -687,12 +637,7 @@ class ApplicationTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $request = new ServerRequest(
-            ['REQUEST_METHOD' => 'GET'],
-            [],
-            '/',
-            'GET'
-        );
+        $request = $this->generateServerRequest();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->get(ServerRequestInterface::class)->willReturn($request);
@@ -754,7 +699,7 @@ class ApplicationTest extends TestCase
         $app = new Application(
             $responseFactoryProphecy->reveal()
         );
-        $app->get('/', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
+        $app->get('[/]', function (ServerRequestInterface $request) use ($responseFactoryProphecy) {
             $response = $responseFactoryProphecy->reveal()->createResponse();
             $response->getBody()->write('Hello World');
 
@@ -779,19 +724,6 @@ class ApplicationTest extends TestCase
             ['DELETE'],
             ['OPTIONS'],
             ['HEAD'],
-        ];
-    }
-
-    public function lowerCaseRequestMethodsProvider()
-    {
-        return [
-            ['get'],
-            ['post'],
-            ['put'],
-            ['patch'],
-            ['delete'],
-            ['options'],
-            ['head'],
         ];
     }
 
@@ -907,5 +839,15 @@ class ApplicationTest extends TestCase
                 ['/foo', '/bar', '/baz/'], '/foo/bar/baz/',
             ],
         ];
+    }
+
+    private function generateServerRequest(string $method = 'GET', string $uri = '/'): ServerRequestInterface
+    {
+        $factory = new Psr17Factory();
+        return $factory->createServerRequest(
+            $method,
+            $uri,
+            ['REQUEST_METHOD' => $method]
+        );
     }
 }

@@ -10,14 +10,12 @@ use SplQueue;
 
 interface MiddlewareDispatcherInterface extends MiddlewareInterface, RequestHandlerInterface
 {
-    /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return MiddlewareDispatcherInterface
-     */
-    public function add($middleware): MiddlewareDispatcherInterface;
+    public function add(
+        MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
+    ): MiddlewareDispatcherInterface;
 
     /**
-     * @return SplQueue
+     * @return SplQueue<MiddlewareInterface>|null
      */
-    public function getMiddleware(): SplQueue;
+    public function getMiddleware(): ?SplQueue;
 }

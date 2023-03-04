@@ -16,24 +16,12 @@ use RuntimeException;
 
 class Router implements RouterInterface
 {
-    /**
-     * @var RouteCollector
-     */
     protected RouteCollector $router;
 
-    /**
-     * @var Dispatcher
-     */
     protected Dispatcher $dispatcher;
 
-    /**
-     * @var bool
-     */
     protected bool $cacheEnabled = false;
 
-    /**
-     * @var string|null
-     */
     protected ?string $cacheFile = null;
 
     /**
@@ -42,7 +30,7 @@ class Router implements RouterInterface
     protected array $routes = [];
 
     /**
-     * @param array|null $config
+     * @param array<string, mixed>|null $config
      */
     public function __construct(?array $config = null)
     {
@@ -58,9 +46,6 @@ class Router implements RouterInterface
         $this->router->addRoute($route->getMethod(), $route->getPath(), $route->getIdentifier());
     }
 
-    /**
-     * @inheritDoc
-     */
     public function match(ServerRequestInterface $request): RouterResults
     {
         $this->dispatcher = $this->getDispatcher();
@@ -96,9 +81,6 @@ class Router implements RouterInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function generateUrl(string $name = "", array $attributes = [], array $queryParams = []): string
     {
         $route = array_filter($this->routes, function ($route) use ($name) {
@@ -154,6 +136,11 @@ class Router implements RouterInterface
         ));
     }
 
+    /**
+     * @param array<string, mixed> $parts
+     * @param array<string, string> $substitutions
+     * @return array<string>
+     */
     private function missingParameters(array $parts, array $substitutions): array
     {
         $missingParameters = [];
@@ -175,6 +162,9 @@ class Router implements RouterInterface
         return [];
     }
 
+    /**
+     * @param array<string, mixed>|null $config
+     */
     protected function loadConfig(?array $config = null): void
     {
         if ($config === null) {
@@ -190,10 +180,6 @@ class Router implements RouterInterface
         }
     }
 
-    /**
-     * @param string|null $cacheFile
-     * @return Dispatcher
-     */
     protected function getDispatcher(?string $cacheFile = null): Dispatcher
     {
         if (null === $cacheFile) {
@@ -210,9 +196,6 @@ class Router implements RouterInterface
         return new Dispatcher(require $cacheFile);
     }
 
-    /**
-     * @return RouteCollector
-     */
     protected function createRouter(): RouteCollector
     {
         return new RouteCollector(new RouteParser(), new DataGenerator());

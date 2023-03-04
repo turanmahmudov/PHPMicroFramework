@@ -8,10 +8,10 @@ use Framework\Middleware\MiddlewareAwareTrait;
 use Framework\Middleware\MiddlewareDispatcherInterface;
 use Framework\Router\RouteAwareTrait;
 use Framework\Router\RouteCollectorInterface;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Http\Discovery\Psr17Factory;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,56 +23,29 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
     use RouteAwareTrait;
     use MiddlewareAwareTrait;
 
-    /**
-     * @var ResponseFactoryInterface
-     */
-    protected ResponseFactoryInterface $responseFactory;
-
-    /**
-     * @var ContainerInterface|null
-     */
-    protected ?ContainerInterface $container;
-
-    /**
-     * @var EmitterInterface|null
-     */
-    protected ?EmitterInterface $responseEmitter;
-
     public function __construct(
-        ResponseFactoryInterface $responseFactory,
-        ?ContainerInterface $container = null,
+        protected ResponseFactoryInterface $responseFactory,
+        protected ?ContainerInterface $container = null,
         ?MiddlewareDispatcherInterface $middlewareDispatcher = null,
         ?RouteCollectorInterface $routeCollector = null,
-        ?EmitterInterface $responseEmitter = null
     ) {
-        $this->responseFactory = $responseFactory;
-        $this->container = $container;
         $this->middlewareDispatcher = $middlewareDispatcher;
-        $this->responseEmitter = $responseEmitter;
         $this->routeCollector = $routeCollector;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->getMiddlewareDispatcher()->handle($request);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         return $this->getMiddlewareDispatcher()->process($request, $handler);
     }
 
     /**
-     * @param ServerRequestInterface|null $request
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function run(?ServerRequestInterface $request = null): void
     {
@@ -80,8 +53,8 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
             if ($this->getContainer() instanceof ContainerInterface) {
                 $request = $this->getContainer()->get(ServerRequestInterface::class);
             } else {
-                // FIXME
-                $request = ServerRequestFactory::fromGlobals();
+                $psr17Factory = new Psr17Factory();
+                $request = $psr17Factory->createServerRequestFromGlobals();
             }
         }
 
@@ -89,27 +62,18 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
         $this->getResponseEmitter()->emit($response);
     }
 
-    /**
-     * @return ContainerInterface|null
-     */
     public function getContainer(): ?ContainerInterface
     {
         return $this->container;
     }
 
-    /**
-     * @return ResponseFactoryInterface
-     */
     public function getResponseFactory(): ResponseFactoryInterface
     {
         return $this->responseFactory;
     }
 
-    /**
-     * @return EmitterInterface
-     */
-    public function getResponseEmitter(): EmitterInterface
+    public function getResponseEmitter(): ResponseEmitter
     {
-        return $this->responseEmitter ?? $this->responseEmitter = new SapiEmitter();
+        return new ResponseEmitter();
     }
 }

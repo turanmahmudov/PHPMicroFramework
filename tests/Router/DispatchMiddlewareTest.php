@@ -6,10 +6,8 @@ namespace Framework\Tests\Router;
 
 use Framework\Router\DispatchMiddleware;
 use Framework\Router\RouteInterface;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;

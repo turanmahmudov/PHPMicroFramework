@@ -12,12 +12,7 @@ use Framework\Router\FastRoute\RouterFactory;
 use Framework\Router\RouteCollectorInterface;
 use Framework\Router\RouteCollectorFactory;
 use Framework\Router\RouterInterface;
-use Laminas\Diactoros\ResponseFactory;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UploadedFileFactory;
-use Laminas\Diactoros\UriFactory;
-use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -30,8 +25,7 @@ use function DI\factory;
 class ContainerFactory
 {
     /**
-     * @param array $containerConfig
-     * @return ContainerInterface
+     * @param array<string, mixed> $containerConfig
      * @throws Exception
      */
     public function __invoke(array $containerConfig = []): ContainerInterface
@@ -39,24 +33,23 @@ class ContainerFactory
         $defaultConfig = [
             // PSR-17
             ResponseFactoryInterface::class => function () {
-                return new ResponseFactory();
+                return Psr17FactoryDiscovery::findResponseFactory();
             },
             ServerRequestFactoryInterface::class => function () {
-                return new ServerRequestFactory();
+                return Psr17FactoryDiscovery::findServerRequestFactory();
             },
             StreamFactoryInterface::class => function () {
-                return new StreamFactory();
+                return Psr17FactoryDiscovery::findStreamFactory();
             },
             UriFactoryInterface::class => function () {
-                return new UriFactory();
+                return Psr17FactoryDiscovery::findUriFactory();
             },
             UploadedFileFactoryInterface::class => function () {
-                return new UploadedFileFactory();
+                return Psr17FactoryDiscovery::findUploadedFileFactory();
             },
 
             Application::class => factory(ApplicationFactory::class),
             MiddlewareDispatcherInterface::class => factory(MiddlewareDispatcherFactory::class),
-            EmitterInterface::class => factory(EmitterFactory::class),
             RouteCollectorInterface::class => factory(RouteCollectorFactory::class),
             RouterInterface::class => factory(RouterFactory::class)
         ];
@@ -65,7 +58,6 @@ class ContainerFactory
 
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->useAutowiring(true);
-        $containerBuilder->useAnnotations(true);
         $containerBuilder->addDefinitions($containerConfig);
 
         return $containerBuilder->build();

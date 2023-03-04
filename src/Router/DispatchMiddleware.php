@@ -11,9 +11,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DispatchMiddleware implements MiddlewareInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         /** @var RouteInterface $routeResult */

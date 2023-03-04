@@ -11,24 +11,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final class EmptyPipelineHandler implements RequestHandlerInterface
 {
-    /**
-     * @var string
-     */
-    protected string $className;
-
-    /**
-     * EmptyPipelineHandler constructor.
-     * @param string $className
-     */
-    public function __construct(string $className)
-    {
-        $this->className = $className;
+    public function __construct(
+        protected string $className,
+    ) {
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         throw new OutOfBoundsException(sprintf(

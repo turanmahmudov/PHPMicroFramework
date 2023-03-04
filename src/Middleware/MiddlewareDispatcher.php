@@ -6,7 +6,9 @@ namespace Framework\Middleware;
 
 use Closure;
 use DomainException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -17,40 +19,26 @@ use SplQueue;
 class MiddlewareDispatcher implements MiddlewareDispatcherInterface
 {
     /**
-     * @var RequestHandlerInterface
-     */
-    protected RequestHandlerInterface $handler;
-
-    /**
-     * @var ContainerInterface|null
-     */
-    protected ?ContainerInterface $container;
-
-    /**
      * @var SplQueue<MiddlewareInterface>|null
      */
     protected ?SplQueue $middleware;
 
-    /**
-     * MiddlewareDispatcher constructor.
-     * @param RequestHandlerInterface $handler
-     * @param ContainerInterface|null $container
-     */
-    public function __construct(RequestHandlerInterface $handler, ?ContainerInterface $container = null)
-    {
-        $this->handler = $handler;
-        $this->container = $container;
-
+    public function __construct(
+        protected RequestHandlerInterface $handler,
+        protected ?ContainerInterface $container = null
+    ) {
         $this->middleware = new SplQueue();
     }
 
     /**
-     * {@inheritDoc}
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function add($middleware): MiddlewareDispatcherInterface
-    {
+    public function add(
+        MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
+    ): MiddlewareDispatcherInterface {
         if (is_string($middleware)) {
-            if ($this->container) {
+            if ($this->container && $this->container->has($middleware)) {
                 $middleware = $this->container->get($middleware);
             } else {
                 $middleware = new $middleware();
@@ -74,10 +62,6 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
         );
     }
 
-    /**
-     * @param MiddlewareInterface $middleware
-     * @return MiddlewareDispatcherInterface
-     */
     public function addMiddleware(MiddlewareInterface $middleware): MiddlewareDispatcherInterface
     {
         $this->enqueue($middleware);
@@ -85,10 +69,6 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
         return $this;
     }
 
-    /**
-     * @param RequestHandlerInterface $middleware
-     * @return MiddlewareDispatcherInterface
-     */
     public function addRequestHandler(RequestHandlerInterface $middleware): MiddlewareDispatcherInterface
     {
         /** @var MiddlewareInterface $middleware */
@@ -118,10 +98,6 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
         return $this;
     }
 
-    /**
-     * @param callable $middleware
-     * @return MiddlewareDispatcherInterface
-     */
     public function addCallable(callable $middleware): MiddlewareDispatcherInterface
     {
         if ($this->container && $middleware instanceof Closure) {
@@ -153,21 +129,11 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
         return $this;
     }
 
-    /**
-     * @param MiddlewareInterface $middleware
-     */
     protected function enqueue(MiddlewareInterface $middleware): void
     {
-        if ($this->middleware) {
-            $this->middleware->enqueue($middleware);
-        }
+        $this->middleware?->enqueue($middleware);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($this->middleware === null) {
@@ -188,19 +154,12 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
         return $middleware->process($request, $next);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->process($request, $this->handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMiddleware(): SplQueue
+    public function getMiddleware(): ?SplQueue
     {
         return $this->middleware;
     }

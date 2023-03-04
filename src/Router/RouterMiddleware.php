@@ -15,23 +15,12 @@ use RuntimeException;
 
 class RouterMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var RouteCollectorInterface
-     */
-    protected RouteCollectorInterface $routeCollector;
-
-    /**
-     * @param RouteCollectorInterface $routeCollector
-     */
-    public function __construct(RouteCollectorInterface $routeCollector)
-    {
-        $this->routeCollector = $routeCollector;
+    public function __construct(
+        protected RouteCollectorInterface $routeCollector
+    ) {
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
      * @throws Exception
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface

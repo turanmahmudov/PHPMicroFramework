@@ -10,25 +10,15 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 trait MiddlewareAwareTrait
 {
-    /**
-     * @var MiddlewareDispatcherInterface|null
-     */
     protected ?MiddlewareDispatcherInterface $middlewareDispatcher;
 
-    /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return Application
-     */
-    public function add($middleware): self
+    public function add(MiddlewareInterface|RequestHandlerInterface|callable|string $middleware): Application
     {
         $this->getMiddlewareDispatcher()->add($middleware);
 
         return $this;
     }
 
-    /**
-     * @return MiddlewareDispatcherInterface
-     */
     public function getMiddlewareDispatcher(): MiddlewareDispatcherInterface
     {
         return $this->middlewareDispatcher ??
@@ -38,9 +28,6 @@ trait MiddlewareAwareTrait
             );
     }
 
-    /**
-     * @param MiddlewareDispatcherInterface $middlewareDispatcher
-     */
     public function setMiddlewareDispatcher(MiddlewareDispatcherInterface $middlewareDispatcher): void
     {
         $this->middlewareDispatcher = $middlewareDispatcher;

@@ -11,11 +11,7 @@ use Psr\Container\ContainerInterface;
 
 class MiddlewareDispatcherFactory
 {
-    /**
-     * @param ContainerInterface $container
-     * @return MiddlewareDispatcherInterface
-     */
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): MiddlewareDispatcherInterface
     {
         return new MiddlewareDispatcher(new EmptyPipelineHandler(__CLASS__), $container);
     }

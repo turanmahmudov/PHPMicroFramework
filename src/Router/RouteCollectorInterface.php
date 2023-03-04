@@ -9,30 +9,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 interface RouteCollectorInterface
 {
     /**
-     * @param string $method
-     * @param string $pattern
-     * @param string|callable|array|RequestHandlerInterface $handler
-     * @return RouteInterface
+     * @param RequestHandlerInterface|callable|string|array<string, string> $handler
      */
-    public function map(string $method, string $pattern, $handler): RouteInterface;
+    public function map(
+        string $method,
+        string $pattern,
+        RequestHandlerInterface|callable|string|array $handler
+    ): RouteInterface;
 
-    /**
-     * @param string $pattern
-     * @param callable $callback
-     * @return GroupInterface
-     */
     public function group(string $pattern, callable $callback): GroupInterface;
 
-    /**
-     * @param string $identifier
-     * @return RouteInterface
-     */
     public function lookupRoute(string $identifier): RouteInterface;
 
-    /**
-     * @param string $name
-     * @return RouteInterface
-     */
     public function getNamedRoute(string $name): RouteInterface;
 
     /**
@@ -40,8 +28,5 @@ interface RouteCollectorInterface
      */
     public function getRoutes(): array;
 
-    /**
-     * @return RouterInterface
-     */
     public function getRouter(): RouterInterface;
 }

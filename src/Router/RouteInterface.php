@@ -11,47 +11,28 @@ use Psr\Http\Server\MiddlewareInterface;
 
 interface RouteInterface extends RequestHandlerInterface
 {
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function run(ServerRequestInterface $request): ResponseInterface;
 
     /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return RouteInterface
+     * @param MiddlewareInterface|RequestHandlerInterface|callable|string|array<string> $middleware
      */
-    public function add($middleware): RouteInterface;
+    public function add(MiddlewareInterface|RequestHandlerInterface|callable|string|array $middleware): RouteInterface;
 
-    /**
-     * @param string $name
-     * @return RouteInterface
-     */
     public function name(string $name): RouteInterface;
 
-    /**
-     * @return string
-     */
     public function getName(): string;
 
-    /**
-     * @return string
-     */
     public function getMethod(): string;
 
-    /**
-     * @return string
-     */
     public function getPath(): string;
 
     /**
-     * @return mixed
+     * @return RequestHandlerInterface|callable|string|array<string, string>
      */
-    public function getRequestHandler();
+    public function getRequestHandler(): RequestHandlerInterface|callable|string|array;
 
     /**
      * @param array<string, mixed> $attributes
-     * @return RouteInterface
      */
     public function withAttributes(array $attributes): RouteInterface;
 
@@ -60,8 +41,5 @@ interface RouteInterface extends RequestHandlerInterface
      */
     public function getAttributes(): array;
 
-    /**
-     * @return string
-     */
     public function getIdentifier(): string;
 }

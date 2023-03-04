@@ -11,29 +11,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 interface GroupInterface
 {
     /**
-     * @param MiddlewareInterface|RequestHandlerInterface|callable|string $middleware
-     * @return GroupInterface
+     * @param MiddlewareInterface|RequestHandlerInterface|callable|string|array<string> $middleware
      */
-    public function add($middleware): GroupInterface;
+    public function add(MiddlewareInterface|RequestHandlerInterface|callable|string|array $middleware): GroupInterface;
 
-    /**
-     * @param MiddlewareDispatcherInterface $dispatcher
-     * @return GroupInterface
-     */
     public function appendMiddlewareToDispatcher(MiddlewareDispatcherInterface $dispatcher): GroupInterface;
 
-    /**
-     * @return GroupInterface
-     */
     public function getRoutes(): GroupInterface;
 
-    /**
-     * @return string
-     */
     public function getPath(): string;
 
     /**
-     * @return array
+     * @return array<MiddlewareInterface|RequestHandlerInterface|callable|string>
      */
     public function getMiddlewares(): array;
 }
