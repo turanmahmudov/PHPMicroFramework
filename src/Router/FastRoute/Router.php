@@ -193,7 +193,7 @@ class Router implements RouterInterface
             );
         }
 
-        return new Dispatcher(require $cacheFile);
+        return new Dispatcher(require_once $cacheFile);
     }
 
     protected function createRouter(): RouteCollector

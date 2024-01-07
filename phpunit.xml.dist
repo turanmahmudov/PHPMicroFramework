@@ -14,6 +14,7 @@
   <coverage>
     <report>
       <html outputDirectory="./build/coverage" lowUpperBound="20" highLowerBound="50"/>
+      <clover outputFile="build/phpunit/clover.xml" />
     </report>
   </coverage>
   <source>

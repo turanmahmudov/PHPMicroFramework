@@ -35,3 +35,10 @@ jobs:
 
       - name: Unit tests
         run: composer test:unit
+
+      - name: Coverage Report
+        uses: lucassabreu/comment-coverage-clover@main
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          file: build/phpunit/clover.xml
+        if: github.event_name == 'pull_request'
