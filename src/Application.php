@@ -52,6 +52,10 @@ class Application implements MiddlewareInterface, RequestHandlerInterface
         if (!$request) {
             if ($this->getContainer() instanceof ContainerInterface) {
                 $request = $this->getContainer()->get(ServerRequestInterface::class);
+
+                if (!($request instanceof ServerRequestInterface)) {
+                    return;
+                }
             } else {
                 $psr17Factory = new Psr17Factory();
                 $request = $psr17Factory->createServerRequestFromGlobals();

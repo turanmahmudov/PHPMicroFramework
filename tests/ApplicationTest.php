@@ -714,7 +714,10 @@ class ApplicationTest extends TestCase
         $this->expectOutputString('Hello World');
     }
 
-    public function upperCaseRequestMethodsProvider()
+    /**
+     * @return array<string[]>
+     */
+    public static function upperCaseRequestMethodsProvider(): array
     {
         return [
             ['GET'],
@@ -727,7 +730,10 @@ class ApplicationTest extends TestCase
         ];
     }
 
-    public function routeGroupsDataProvider()
+    /**
+     * @return array<string, array>
+     */
+    public static function routeGroupsDataProvider(): array
     {
         return [
             'empty group with empty route' => [
